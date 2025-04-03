@@ -1,6 +1,7 @@
 import { JSX, Suspense } from "react";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
+import Explore from "./pages/Explore/Explore";
 // import ErrorPage from "./pages/Global/ErrorPage";
 // import Layout from "./pages/Global/Layout";
 import Home from "./pages/Home";
@@ -41,6 +42,12 @@ const Router = () => {
 
   const routes_children = [
     { path: "/", element: <Home />, hasHeader: true, hasFooter: true },
+    {
+      path: "/explore",
+      element: <Explore />,
+      hasHeader: true,
+      hasFooter: true,
+    },
     // ...routes_children_auth,
     // { path: "/*", element: <ErrorPage /> },
   ];
