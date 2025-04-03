@@ -1,50 +1,64 @@
-import type React from "react"
+import type React from "react";
+import { useState } from "react";
+import { addMinutes, format } from "date-fns";
+import { Calendar } from "lucide-react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { format, addMinutes } from "date-fns"
-import { Calendar } from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar as CalendarComponent } from "@/components/ui/calendar"
+import { Button } from "@/components/ui/button";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-type EventType = "식사" | "관광" | "숙박" | "이동" | "기타"
+type EventType = "식사" | "관광" | "숙박" | "이동" | "기타";
 
 interface AddEventFormProps {
-  selectedDate: Date
+  selectedDate: Date;
   onAddEvent: (event: {
-    title: string
-    date: Date
-    startTime: Date
-    endTime: Date
-    type: EventType
-    description?: string
-  }) => void
-  onCancel: () => void
+    title: string;
+    date: Date;
+    startTime: Date;
+    endTime: Date;
+    type: EventType;
+    description?: string;
+  }) => void;
+  onCancel: () => void;
 }
 
-export function AddEventForm({ selectedDate, onAddEvent, onCancel }: AddEventFormProps) {
-  const [title, setTitle] = useState("")
-  const [date, setDate] = useState<Date | undefined>(selectedDate)
-  const [startTime, setStartTime] = useState("09:00")
-  const [duration, setDuration] = useState("60")
-  const [eventType, setEventType] = useState<EventType>("관광")
-  const [description, setDescription] = useState("")
+export function AddEventForm({
+  selectedDate,
+  onAddEvent,
+  onCancel,
+}: AddEventFormProps) {
+  const [title, setTitle] = useState("");
+  const [date, setDate] = useState<Date | undefined>(selectedDate);
+  const [startTime, setStartTime] = useState("09:00");
+  const [duration, setDuration] = useState("60");
+  const [eventType, setEventType] = useState<EventType>("관광");
+  const [description, setDescription] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!title || !date || !startTime || !duration) return
+    if (!title || !date || !startTime || !duration) return;
 
     // Parse start time
-    const [hours, minutes] = startTime.split(":").map(Number)
-    const startDateTime = new Date(date)
-    startDateTime.setHours(hours, minutes, 0, 0)
+    const [hours, minutes] = startTime.split(":").map(Number);
+    const startDateTime = new Date(date);
+    startDateTime.setHours(hours, minutes, 0, 0);
 
     // Calculate end time based on duration
-    const endDateTime = addMinutes(startDateTime, Number.parseInt(duration))
+    const endDateTime = addMinutes(startDateTime, Number.parseInt(duration));
 
     onAddEvent({
       title,
@@ -53,8 +67,8 @@ export function AddEventForm({ selectedDate, onAddEvent, onCancel }: AddEventFor
       endTime: endDateTime,
       type: eventType,
       description: description || undefined,
-    })
-  }
+    });
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -74,20 +88,31 @@ export function AddEventForm({ selectedDate, onAddEvent, onCancel }: AddEventFor
           <Label>날짜</Label>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-start text-left font-normal">
+              <Button
+                variant="outline"
+                className="w-full justify-start text-left font-normal"
+              >
                 <Calendar className="mr-2 h-4 w-4" />
                 {date ? format(date, "yyyy년 MM월 dd일") : "날짜 선택"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
-              <CalendarComponent mode="single" selected={date} onSelect={setDate} initialFocus />
+              <CalendarComponent
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+              />
             </PopoverContent>
           </Popover>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="event-type">일정 유형</Label>
-          <Select value={eventType} onValueChange={(value) => setEventType(value as EventType)}>
+          <Select
+            value={eventType}
+            onValueChange={(value) => setEventType(value as EventType)}
+          >
             <SelectTrigger id="event-type">
               <SelectValue placeholder="유형 선택" />
             </SelectTrigger>
@@ -153,6 +178,5 @@ export function AddEventForm({ selectedDate, onAddEvent, onCancel }: AddEventFor
         <Button type="submit">일정 추가</Button>
       </div>
     </form>
-  )
+  );
 }
-
