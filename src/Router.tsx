@@ -1,6 +1,7 @@
 import { JSX, Suspense } from "react";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
+import Dashboard from "./pages/Dashboard/Dashboard";
 import Explore from "./pages/Explore/Explore";
 // import ErrorPage from "./pages/Global/ErrorPage";
 // import Layout from "./pages/Global/Layout";
@@ -19,7 +20,6 @@ interface RoutesChildren {
 
 const Layout = ({ routes_children }: RoutesChildren) => {
   // const { pathname } = useLocation();
-  console.log(routes_children);
 
   return (
     <div id="layout" className="h-full w-full">
@@ -45,6 +45,12 @@ const Router = () => {
     {
       path: "/explore",
       element: <Explore />,
+      hasHeader: true,
+      hasFooter: true,
+    },
+    {
+      path: "/dashboard",
+      element: <Dashboard />,
       hasHeader: true,
       hasFooter: true,
     },
