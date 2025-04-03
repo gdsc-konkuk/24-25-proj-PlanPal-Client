@@ -1,6 +1,7 @@
 import { JSX, Suspense } from "react";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
+import Chat from "./pages/Chat/Chat";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Explore from "./pages/Explore/Explore";
 // import ErrorPage from "./pages/Global/ErrorPage";
@@ -54,6 +55,7 @@ const Router = () => {
       hasHeader: true,
       hasFooter: true,
     },
+    { path: "/chat", element: <Chat />, hasHeader: true, hasFooter: true },
     // ...routes_children_auth,
     // { path: "/*", element: <ErrorPage /> },
   ];
