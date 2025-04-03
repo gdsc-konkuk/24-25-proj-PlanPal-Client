@@ -49,7 +49,7 @@ const Router = () => {
       hasFooter: true,
     },
     {
-      path: "/dashboard",
+      path: "/dashboard", //TODO: 여기에 DashboardLayout 적용하기
       element: <Dashboard />,
       hasHeader: true,
       hasFooter: true,
