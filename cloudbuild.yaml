@@ -1,0 +1,35 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "-t",
+        "asia-northeast3-docker.pkg.dev/gen-lang-client-0798322573/planpal-client/planpal-client:$SHORT_SHA",
+        ".",
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "push",
+        "asia-northeast3-docker.pkg.dev/gen-lang-client-0798322573/planpal-client/planpal-client:$SHORT_SHA",
+      ]
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      [
+        "run",
+        "deploy",
+        "planpal-client",
+        "--image",
+        "asia-northeast3-docker.pkg.dev/gen-lang-client-0798322573/planpal-client/planpal-client:$SHORT_SHA",
+        "--region",
+        "asia-northeast3",
+        "--platform",
+        "managed",
+        "--allow-unauthenticated",
+      ]
+
+images:
+  - "asia-northeast3-docker.pkg.dev/gen-lang-client-0798322573/planpal-client/planpal-client:$SHORT_SHA"
