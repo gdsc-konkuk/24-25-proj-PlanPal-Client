@@ -1,0 +1,13 @@
+{
+  "hosting": {
+    "rewrites": [
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "planpal-client",
+          "region": "asia-northeast3"
+        }
+      }
+    ]
+  }
+}
