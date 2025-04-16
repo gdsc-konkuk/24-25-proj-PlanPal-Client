@@ -2,6 +2,14 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 steps:
+  - name: "gcr.io/cloud-builders/bash"
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        echo "NEXT_PUBLIC_API_URL=$_API_SERVER_URL" >> .env.production
+        echo "NEXT_PUBLIC_MAPS_KEY=$_NEXT_PUBLIC_API_SERVER_URL" >> .env.production
+
   - name: "gcr.io/cloud-builders/docker"
     args:
       [
