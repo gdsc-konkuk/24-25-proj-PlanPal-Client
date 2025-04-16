@@ -8,6 +8,7 @@ import { ArrowRight, Globe, Users, Map } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { useState } from "react";
 import { LoginModal } from "./modules/landing/ui/components/login-modal";
+import { LoginButton } from "@/components/login-button";
 
 export default function HomePage() {
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -39,13 +40,7 @@ export default function HomePage() {
             </Link>
           </nav>
           <div className="flex items-center space-x-4">
-            <Button
-              variant="outline"
-              onClick={() => setShowLoginModal(true)}
-              className="hidden md:inline-flex"
-            >
-              Log in
-            </Button>
+            <LoginButton setShowLoginModal={setShowLoginModal} />
           </div>
         </div>
       </header>

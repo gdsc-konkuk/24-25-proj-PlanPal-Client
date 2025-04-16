@@ -1,6 +1,7 @@
 "use client";
 
 import { oauthRequest } from "@/app/modules/auth/actions/oauth";
+import { useAuthStore } from "@/store/auth-store";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -16,7 +17,7 @@ export default function GoogleAuth() {
       if (code) {
         try {
           accessToken = await oauthRequest(code);
-          localStorage.setItem("accessToken", accessToken);
+          useAuthStore.setState({ accessToken });
         } catch (error) {
           setError(`error : ${(error as Error).message}`);
         }

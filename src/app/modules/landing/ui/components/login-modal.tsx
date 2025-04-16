@@ -26,6 +26,7 @@ export function LoginModal({
   const handleGoogleAuth = () => {
     router.push(OAUTH_URL);
   };
+
   return (
     <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
       <DialogContent className="sm:max-w-[425px]">
