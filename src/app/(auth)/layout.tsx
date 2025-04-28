@@ -12,23 +12,28 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   const accessToken = useAuthStore((state) => state.accessToken);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
+    if (!isInitialized) return;
+
     if (accessToken === null) {
       router.replace(`/?from=${pathname}`);
+      toast.error("You need to login first");
     }
-    toast.error("You need to login first");
   }, [accessToken]);
 
-  if (accessToken === undefined) {
+  if (!isInitialized) {
     return (
       <div className="flex items-center justify-center h-screen w-screen bg-background text-foreground">
         <LoaderCircle className="h-10 w-10 animate-spin" />
       </div>
     );
   }
+
+  if (accessToken === null) return null;
 
   return <>{children}</>;
 }

@@ -5,6 +5,7 @@ import { useAuthStore } from "@/store/auth-store";
 
 export function AuthInitializer() {
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
+  const setInitialized = useAuthStore((state) => state.setInitialized);
 
   useEffect(() => {
     const fetchAccessToken = async () => {
@@ -20,9 +21,12 @@ export function AuthInitializer() {
         if (!res.ok) throw new Error("Not logged in");
 
         const { accessToken } = await res.json();
+        console.log(accessToken);
         setAccessToken(accessToken);
       } catch {
         setAccessToken(null);
+      } finally {
+        setInitialized(true);
       }
     };
 
