@@ -1,6 +1,6 @@
 "use client";
 
-import { oauthRequest } from "@/app/modules/auth/actions/oauth";
+import { oauthRequest } from "@/app/modules/auth/api/oauth";
 import { useAuthStore } from "@/store/auth-store";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";

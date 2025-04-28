@@ -1,9 +1,9 @@
 "use client";
 
-import { logoutAction } from "@/app/modules/auth/actions/logout";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth-store";
+import { logoutRequest } from "@/app/modules/auth/api/logout";
 
 interface LoginButtonProps {
   setShowLoginModal: (show: boolean) => void;
@@ -19,7 +19,7 @@ export function LoginButton({ setShowLoginModal }: LoginButtonProps) {
 
   const handleLogout = async () => {
     useAuthStore.setState({ accessToken: null });
-    await logoutAction();
+    await logoutRequest();
     router.push("/");
   };
 

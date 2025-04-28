@@ -1,5 +1,4 @@
 import { useAuthStore } from "@/store/auth-store";
-import { logoutAction } from "@/app/modules/auth/actions/logout";
 
 type FetchWithAuthOptions = {
   onAuthFail?: () => void;
@@ -50,7 +49,6 @@ export async function fetchAuth(
       console.error("Refresh failed, logging out", err);
 
       setAccessToken(null);
-      await logoutAction();
       options?.onAuthFail?.();
     }
   }
