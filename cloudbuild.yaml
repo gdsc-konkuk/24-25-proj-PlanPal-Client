@@ -12,8 +12,8 @@ steps:
     args:
       - "-c"
       - |
-        echo 'API_SERVER_URL=$$SECRET_SERVER_URL' >> .env.production
-        echo 'NEXT_PUBLIC_API_SERVER_URL=$$SECRET_SERVER_URL' >> .env.production
+        echo "API_SERVER_URL=$$SECRET_SERVER_URL" >> .env.production
+        echo "NEXT_PUBLIC_API_SERVER_URL=$$SECRET_SERVER_URL" >> .env.production
     secretEnv: ["SECRET_SERVER_URL"]
 
   - name: "gcr.io/cloud-builders/docker"
