@@ -3,9 +3,9 @@
 import { oauthRequest } from "@/app/modules/auth/api/oauth";
 import { useAuthStore } from "@/store/auth-store";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
-export default function GoogleAuth() {
+function GoogleAuth() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const code = searchParams.get("code");
@@ -39,4 +39,12 @@ export default function GoogleAuth() {
         )}
       </div>
     );
+}
+
+export default function GoogleAuthPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <GoogleAuth />
+    </Suspense>
+  );
 }
