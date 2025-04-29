@@ -24,7 +24,6 @@ export function LoginModal({
   const router = useRouter();
 
   const handleGoogleAuth = () => {
-    alert(`${OAUTH_URL}`);
     router.push(OAUTH_URL);
   };
 

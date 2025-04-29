@@ -21,7 +21,6 @@ export function AuthInitializer() {
         if (!res.ok) throw new Error("Not logged in");
 
         const { accessToken } = await res.json();
-        console.log(accessToken);
         setAccessToken(accessToken);
       } catch {
         setAccessToken(null);
