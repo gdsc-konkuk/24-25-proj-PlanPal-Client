@@ -9,6 +9,7 @@ FROM base AS deps
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
+COPY .env.production .env.production
 RUN pnpm build
 
 FROM node:22-slim AS runner
