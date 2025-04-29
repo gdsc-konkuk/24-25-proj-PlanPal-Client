@@ -1,3 +1,8 @@
+availableSecrets:
+  secretManager:
+    - versionName: projects/772190012442/secrets/SERVER_URL/versions/latest
+      env: SECRET_SERVER_URL
+
 options:
   logging: CLOUD_LOGGING_ONLY
 
@@ -7,8 +12,9 @@ steps:
     args:
       - "-c"
       - |
-        echo "NEXT_PUBLIC_API_URL=$_API_SERVER_URL" >> .env.production
-        echo "NEXT_PUBLIC_MAPS_KEY=$_NEXT_PUBLIC_API_SERVER_URL" >> .env.production
+        echo 'API_SERVER_URL=$$SECRET_SERVER_URL' >> .env.production
+        echo 'NEXT_PUBLIC_API_SERVER_URL=$$SECRET_SERVER_URL' >> .env.production
+    secretEnv: ["SECRET_SERVER_URL"]
 
   - name: "gcr.io/cloud-builders/docker"
     args:
