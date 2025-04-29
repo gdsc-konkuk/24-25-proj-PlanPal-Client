@@ -1,7 +1,8 @@
 const CLIENT_ID =
   "772190012442-peous61g4t8so3r9rt6gb6eb60gpu26i.apps.googleusercontent.com";
 const REDIRECT_URI = encodeURIComponent(
-  "http://localhost:3000/oauth/google/callback"
+  process.env.NEXT_PUBLIC_CALLBACK_URL ||
+    "http://localhost:3000/oauth/google/callback"
 );
 const RESPONSE_TYPE = "code";
 const SCOPE = encodeURIComponent("openid profile email");
