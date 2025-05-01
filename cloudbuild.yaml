@@ -14,7 +14,7 @@ steps:
       - |
         echo "API_SERVER_URL=$$SECRET_SERVER_URL" >> .env.production
         echo "NEXT_PUBLIC_API_SERVER_URL=$$SECRET_SERVER_URL" >> .env.production
-        echo "NEXT_PUBLIC_CALLBACK_URL=https://planpal.site/oauth/google/callback" >> .env.production
+        echo "NEXT_PUBLIC_CALLBACK_URL=https://planpal-client-772190012442.asia-northeast3.run.app/oauth/google/callback" >> .env.production
     secretEnv: ["SECRET_SERVER_URL"]
 
   - name: "gcr.io/cloud-builders/docker"
