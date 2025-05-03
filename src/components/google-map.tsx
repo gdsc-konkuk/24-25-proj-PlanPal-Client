@@ -3,15 +3,19 @@
 import { useEffect, useRef, useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { MapOverlay } from "./map-overlay";
+import { useMapStore } from "@/store/map-store";
 
 export function GoogleMap() {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [googleMaps, setGoogleMaps] = useState<typeof google.maps | null>(null);
   const [placeInfo, setPlaceInfo] = useState<{
     place: google.maps.places.PlaceResult;
     position: google.maps.LatLng;
+    placeId: string;
   } | null>(null);
+  const map = useMapStore((state) => state.map);
+  const setMap = useMapStore((state) => state.setMap);
+  const googleMaps = useMapStore((state) => state.googleMaps);
+  const setGoogleMaps = useMapStore((state) => state.setGoogleMaps);
 
   useEffect(() => {
     const initMap = async () => {
@@ -60,7 +64,11 @@ export function GoogleMap() {
                 status === google.maps.places.PlacesServiceStatus.OK &&
                 place
               ) {
-                setPlaceInfo({ place, position: evt.latLng! });
+                setPlaceInfo({
+                  place,
+                  position: evt.latLng!,
+                  placeId: evt.placeId!,
+                });
               }
             }
           );
@@ -71,35 +79,14 @@ export function GoogleMap() {
     initMap();
   }, []);
 
-  const handleLike = () => {
-    if (!map || !googleMaps || !placeInfo) return;
-
-    const img = document.createElement("img");
-    img.src = "/heart.png";
-    img.style.width = "36px";
-    img.style.height = "36px";
-
-    new google.maps.marker.AdvancedMarkerElement({
-      map,
-      position: placeInfo.position,
-      content: img,
-      title: "찜한 장소",
-    });
-
-    setPlaceInfo(null);
-  };
-
   return (
     <div className="relative w-full h-full">
       <div ref={mapRef} className="w-full h-full rounded-lg" />
       {googleMaps && map && placeInfo && (
         <MapOverlay
-          googleMaps={googleMaps}
-          map={map}
-          place={placeInfo.place}
+          placeInfo={placeInfo}
           position={placeInfo.position}
           onClose={() => setPlaceInfo(null)}
-          onLike={handleLike}
         />
       )}
     </div>
