@@ -58,6 +58,8 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { WeeklyScheduleView } from "@/components/weekly-schedule-view";
 import { ResizableLayout } from "@/components/resizable-layout";
+import { LikedPlace, useLikedPlaces } from "@/store/liked-place-store";
+import { useMapStore } from "@/store/map-store";
 
 type MessageType = {
   id: string;
@@ -136,7 +138,6 @@ export default function Chat() {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [destination, setDestination] = useState("");
-  const [places, setPlaces] = useState<PlaceInfo[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   // 패널 가시성 상태
@@ -151,6 +152,12 @@ export default function Chat() {
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const map = useMapStore((state) => state.map);
+  const likedPlaces = useLikedPlaces((state) => state.likedPlaces);
+  const setIsConfirmed = useLikedPlaces((state) => state.setIsConfirmed);
+  const getIsConfirmed = useLikedPlaces((state) => state.getIsConfirmed);
+  const getMarker = useLikedPlaces((state) => state.getMarker);
 
   // 패널 가시성 변경 핸들러 - 이 함수는 ResizableLayout에서만 호출되도록 수정
   const handlePanelVisibilityChange = (
@@ -212,215 +219,6 @@ export default function Chat() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  // Sample places data
-  useEffect(() => {
-    if (destination.toLowerCase().includes("tokyo")) {
-      setPlaces([
-        {
-          id: "place1",
-          name: "Tokyo Skytree",
-          lat: 35.7101,
-          lng: 139.8107,
-          address: "1 Chome-1-2 Oshiage, Sumida City, Tokyo 131-0045, Japan",
-          description:
-            "The tallest tower in Japan with observation decks offering panoramic views of Tokyo.",
-          category: "Landmark",
-          rating: 4.5,
-          isFavorite: true,
-          isConfirmed: true,
-          addedBy: "You",
-          addedAt: new Date(2023, 5, 15),
-          visitTime: new Date(2023, 5, 15, 10, 0),
-          duration: 120,
-          type: "관광",
-        },
-        {
-          id: "place2",
-          name: "Meiji Shrine",
-          lat: 35.6763,
-          lng: 139.6993,
-          address: "1-1 Yoyogikamizonocho, Shibuya City, Tokyo 151-8557, Japan",
-          description:
-            "A peaceful Shinto shrine dedicated to Emperor Meiji and Empress Shoken.",
-          category: "Religious Site",
-          rating: 4.7,
-          isFavorite: true,
-          isConfirmed: true,
-          addedBy: "Kim",
-          addedAt: new Date(2023, 5, 16),
-          visitTime: new Date(2023, 5, 16, 14, 0),
-          duration: 90,
-          type: "관광",
-        },
-        {
-          id: "place3",
-          name: "Shibuya Crossing",
-          lat: 35.6595,
-          lng: 139.7004,
-          address: "2 Chome-2-1 Dogenzaka, Shibuya City, Tokyo 150-0043, Japan",
-          description:
-            "The world's busiest pedestrian crossing and a major Tokyo landmark.",
-          category: "Landmark",
-          rating: 4.6,
-          isFavorite: false,
-          isConfirmed: true,
-          addedBy: "Lee",
-          addedAt: new Date(2023, 5, 17),
-          visitTime: new Date(2023, 5, 17, 16, 0),
-          duration: 60,
-          type: "관광",
-        },
-        {
-          id: "place4",
-          name: "Senso-ji Temple",
-          lat: 35.7147,
-          lng: 139.7966,
-          address: "2 Chome-3-1 Asakusa, Taito City, Tokyo 111-0032, Japan",
-          description:
-            "Tokyo's oldest temple, featuring a large lantern and shopping street.",
-          category: "Religious Site",
-          rating: 4.7,
-          isFavorite: true,
-          isConfirmed: false,
-          addedBy: "AI Assistant",
-          addedAt: new Date(2023, 5, 18),
-          visitTime: new Date(2023, 5, 18, 9, 0),
-          duration: 120,
-          type: "관광",
-        },
-        {
-          id: "place5",
-          name: "Tokyo Disneyland",
-          lat: 35.6329,
-          lng: 139.8804,
-          address: "1-1 Maihama, Urayasu, Chiba 279-0031, Japan",
-          description:
-            "A theme park featuring classic Disney attractions and characters.",
-          category: "Entertainment",
-          rating: 4.8,
-          isFavorite: false,
-          isConfirmed: false,
-          addedBy: "Park",
-          addedAt: new Date(2023, 5, 19),
-          visitTime: new Date(2023, 5, 19, 9, 0),
-          duration: 480,
-          type: "관광",
-        },
-        {
-          id: "place6",
-          name: "Tsukiji Outer Market",
-          lat: 35.6654,
-          lng: 139.7707,
-          address: "4 Chome-16-2 Tsukiji, Chuo City, Tokyo 104-0045, Japan",
-          description:
-            "A bustling market with fresh seafood, produce, and street food.",
-          category: "Market",
-          rating: 4.5,
-          isFavorite: false,
-          isConfirmed: false,
-          addedBy: "AI Assistant",
-          addedAt: new Date(2023, 5, 20),
-          visitTime: new Date(2023, 5, 20, 7, 0),
-          duration: 120,
-          type: "식사",
-        },
-        {
-          id: "place7",
-          name: "Ichiran Ramen Shibuya",
-          lat: 35.6595,
-          lng: 139.7004,
-          address: "1 Chome-22-7 Jinnan, Shibuya City, Tokyo 150-0041, Japan",
-          description:
-            "Famous ramen restaurant known for individual booths and customizable noodles.",
-          category: "Restaurant",
-          rating: 4.6,
-          isFavorite: true,
-          isConfirmed: true,
-          addedBy: "You",
-          addedAt: new Date(2023, 5, 17),
-          visitTime: new Date(2023, 5, 17, 12, 30),
-          duration: 60,
-          type: "식사",
-        },
-        {
-          id: "place8",
-          name: "Hotel Gracery Shinjuku",
-          lat: 35.6941,
-          lng: 139.7015,
-          address:
-            "1 Chome-19-1 Kabukicho, Shinjuku City, Tokyo 160-8466, Japan",
-          description:
-            "Modern hotel with a Godzilla statue on the roof, located in the heart of Shinjuku.",
-          category: "Hotel",
-          rating: 4.3,
-          isFavorite: true,
-          isConfirmed: true,
-          addedBy: "Kim",
-          addedAt: new Date(2023, 5, 15),
-          visitTime: new Date(2023, 5, 15, 15, 0),
-          duration: 720,
-          type: "숙박",
-        },
-      ]);
-      setDestination("Tokyo, Japan");
-
-      // Sample schedule items
-      const sampleScheduleItems: ScheduleItem[] = [
-        {
-          id: "schedule1",
-          placeId: "place1",
-          title: "Tokyo Skytree 관람",
-          date: new Date(2023, 5, 15),
-          startTime: new Date(2023, 5, 15, 10, 0),
-          endTime: new Date(2023, 5, 15, 12, 0),
-          type: "관광",
-          color: "#88C58F",
-        },
-        {
-          id: "schedule2",
-          placeId: "place7",
-          title: "Ichiran Ramen 점심",
-          date: new Date(2023, 5, 15),
-          startTime: new Date(2023, 5, 15, 12, 30),
-          endTime: new Date(2023, 5, 15, 13, 30),
-          type: "식사",
-          color: "#F59E0B",
-        },
-        {
-          id: "schedule3",
-          placeId: "place8",
-          title: "Hotel Gracery 체크인",
-          date: new Date(2023, 5, 15),
-          startTime: new Date(2023, 5, 15, 15, 0),
-          endTime: new Date(2023, 5, 16, 10, 0),
-          type: "숙박",
-          color: "#60A5FA",
-        },
-        {
-          id: "schedule4",
-          placeId: "place2",
-          title: "Meiji Shrine 방문",
-          date: new Date(2023, 5, 16),
-          startTime: new Date(2023, 5, 16, 14, 0),
-          endTime: new Date(2023, 5, 16, 15, 30),
-          type: "관광",
-          color: "#88C58F",
-        },
-        {
-          id: "schedule5",
-          placeId: "place3",
-          title: "Shibuya Crossing 구경",
-          date: new Date(2023, 5, 17),
-          startTime: new Date(2023, 5, 17, 16, 0),
-          endTime: new Date(2023, 5, 17, 17, 0),
-          type: "관광",
-          color: "#88C58F",
-        },
-      ];
-      setScheduleItems(sampleScheduleItems);
-    }
-  }, [destination]);
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
@@ -563,51 +361,57 @@ export default function Chat() {
     );
   };
 
-  const toggleConfirmed = (placeId: string) => {
-    setPlaces(
-      places.map((place) =>
-        place.id === placeId
-          ? { ...place, isConfirmed: !place.isConfirmed }
-          : place
-      )
-    );
+  const toggleConfirmed = (place: LikedPlace) => {
+    const placeId = place.placeId;
+    const isConfirmed = getIsConfirmed(placeId);
+    setIsConfirmed(placeId, !isConfirmed);
+    const marker = getMarker(placeId);
+
+    const img = document.createElement("img");
+    img.src = !isConfirmed ? "/star.png" : "/heart.png";
+    img.style.width = "36px";
+    img.style.height = "36px";
+
+    if (marker) marker.content = img;
   };
 
   // Filter places based on selected filters
-  const filteredPlaces = places.filter((place) => {
+  const filteredPlaces = likedPlaces.filter((place) => {
     // First filter by confirmed/candidates tab
     const matchesTab =
       activePlacesTab === "confirmed" ? place.isConfirmed : !place.isConfirmed;
 
-    // Then apply additional filters
-    const matchesType = placeFilter === "all" || place.type === placeFilter;
+    // // Then apply additional filters
+    // const matchesType = placeFilter === "all" || place.type === placeFilter;
 
-    // Time filter
-    let matchesTime = true;
-    if (timeFilter !== "all" && place.visitTime) {
-      const hour = place.visitTime.getHours();
-      if (timeFilter === "morning" && (hour < 5 || hour >= 12))
-        matchesTime = false;
-      if (timeFilter === "afternoon" && (hour < 12 || hour >= 17))
-        matchesTime = false;
-      if (timeFilter === "evening" && (hour < 17 || hour >= 21))
-        matchesTime = false;
-      if (timeFilter === "night" && (hour < 21 || hour >= 5))
-        matchesTime = false;
-    }
+    // // Time filter
+    // let matchesTime = true;
+    // if (timeFilter !== "all" && place.visitTime) {
+    //   const hour = place.visitTime.getHours();
+    //   if (timeFilter === "morning" && (hour < 5 || hour >= 12))
+    //     matchesTime = false;
+    //   if (timeFilter === "afternoon" && (hour < 12 || hour >= 17))
+    //     matchesTime = false;
+    //   if (timeFilter === "evening" && (hour < 17 || hour >= 21))
+    //     matchesTime = false;
+    //   if (timeFilter === "night" && (hour < 21 || hour >= 5))
+    //     matchesTime = false;
+    // }
 
-    // Date filter
-    let matchesDate = true;
-    if (dateFilter && place.visitTime) {
-      const visitDate = new Date(place.visitTime);
-      const filterDate = new Date(dateFilter);
-      matchesDate =
-        visitDate.getFullYear() === filterDate.getFullYear() &&
-        visitDate.getMonth() === filterDate.getMonth() &&
-        visitDate.getDate() === filterDate.getDate();
-    }
+    // // Date filter
+    // let matchesDate = true;
+    // if (dateFilter && place.visitTime) {
+    //   const visitDate = new Date(place.visitTime);
+    //   const filterDate = new Date(dateFilter);
+    //   matchesDate =
+    //     visitDate.getFullYear() === filterDate.getFullYear() &&
+    //     visitDate.getMonth() === filterDate.getMonth() &&
+    //     visitDate.getDate() === filterDate.getDate();
+    // }
 
-    return matchesTab && matchesType && matchesTime && matchesDate;
+    // return matchesTab && matchesType && matchesTime && matchesDate;
+
+    return matchesTab;
   });
 
   // Get the type icon for a place
@@ -670,28 +474,14 @@ export default function Chat() {
 
         <TabsContent value="map" className="flex-1 p-4 overflow-hidden">
           <div className="h-full rounded-lg overflow-hidden">
-            <GoogleMap
-              locations={places.map((place) => ({
-                id: place.id,
-                name: place.name,
-                lat: place.lat,
-                lng: place.lng,
-                type: place.isConfirmed ? "recommended" : "mentioned",
-                description: place.description,
-              }))}
-              center={
-                places.length > 0
-                  ? { lat: places[0].lat, lng: places[0].lng }
-                  : undefined
-              }
-            />
+            <GoogleMap />
           </div>
         </TabsContent>
 
         <TabsContent value="calendar" className="flex-1 overflow-hidden">
           <WeeklyScheduleView
             scheduleItems={scheduleItems}
-            places={places}
+            places={likedPlaces}
             onAddEvent={handleAddEvent}
           />
         </TabsContent>
@@ -792,7 +582,7 @@ export default function Chat() {
           {filteredPlaces.length > 0 ? (
             <div className="space-y-3">
               {filteredPlaces.map((place) => (
-                <Card key={place.id} className="overflow-hidden">
+                <Card key={place.placeId} className="overflow-hidden">
                   <CardContent className="p-3">
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
@@ -872,7 +662,7 @@ export default function Chat() {
                             variant="ghost"
                             size="sm"
                             className="h-6 text-xs"
-                            onClick={() => toggleConfirmed(place.id)}
+                            onClick={() => toggleConfirmed(place)}
                           >
                             {activePlacesTab === "confirmed"
                               ? "Remove"
