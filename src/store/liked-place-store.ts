@@ -1,11 +1,12 @@
 import { create } from "zustand";
 
-type LikedPlace = {
+export type LikedPlace = {
   placeId: string;
   name: string;
   lat: number;
   lng: number;
   marker?: google.maps.marker.AdvancedMarkerElement;
+  isConfirmed: boolean;
 };
 
 type LikedPlaceStore = {
@@ -20,6 +21,8 @@ type LikedPlaceStore = {
   getMarker: (
     placeId: string
   ) => google.maps.marker.AdvancedMarkerElement | undefined;
+  setIsConfirmed: (placeId: string, isConfirmed: boolean) => void;
+  getIsConfirmed: (placeId: string) => boolean;
 };
 
 export const useLikedPlaces = create<LikedPlaceStore>((set, get) => ({
@@ -41,4 +44,12 @@ export const useLikedPlaces = create<LikedPlaceStore>((set, get) => ({
     })),
   getMarker: (placeId) =>
     get().likedPlaces.find((p) => p.placeId === placeId)?.marker,
+  setIsConfirmed: (placeId, isConfirmed) =>
+    set((state) => ({
+      likedPlaces: state.likedPlaces.map((p) =>
+        p.placeId === placeId ? { ...p, isConfirmed } : p
+      ),
+    })),
+  getIsConfirmed: (placeId) =>
+    get().likedPlaces.find((p) => p.placeId === placeId)?.isConfirmed || false,
 }));

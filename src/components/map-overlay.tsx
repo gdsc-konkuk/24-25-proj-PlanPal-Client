@@ -36,6 +36,7 @@ export function MapOverlay({ position, placeInfo, onClose }: MapOverlayProps) {
         name: placeInfo.place.name || "Unknown",
         lat: position.lat(),
         lng: position.lng(),
+        isConfirmed: false,
       });
 
       const img = document.createElement("img");
