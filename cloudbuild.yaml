@@ -2,6 +2,8 @@ availableSecrets:
   secretManager:
     - versionName: projects/772190012442/secrets/SERVER_URL/versions/latest
       env: SECRET_SERVER_URL
+    - versionName: projects/772190012442/secrets/GOOGLE_MAPS_API_KEY/versions/latest
+      env: SECRET_GOOGLE_MAPS_API_KEY
 
 options:
   logging: CLOUD_LOGGING_ONLY
