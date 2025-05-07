@@ -30,7 +30,7 @@ export function Logo({
           size === "sm" ? "text-lg" : size === "md" ? "text-xl" : "text-2xl"
         }`}
       >
-        planpal
+        PlanPal
       </span>
     </Link>
   );

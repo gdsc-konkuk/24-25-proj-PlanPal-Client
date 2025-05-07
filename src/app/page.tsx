@@ -2,55 +2,23 @@
 
 import type React from "react";
 
-import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Globe, Users, Map } from "lucide-react";
 import { Logo } from "@/components/logo";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { GoogleIcon } from "@/components/icons";
+import { useState } from "react";
+import { LoginModal } from "./modules/landing/ui/components/login-modal";
+import { LoginButton } from "@/components/login-button";
 
 export default function HomePage() {
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showSignupModal, setShowSignupModal] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    // 실제 로그인 로직 구현 필요
-    console.log("Login with:", email, password);
-    setShowLoginModal(false);
-  };
-
-  const handleSignup = (e: React.FormEvent) => {
-    e.preventDefault();
-    // 실제 회원가입 로직 구현 필요
-    console.log("Signup with:", name, email, password);
-    setShowSignupModal(false);
-  };
-
-  const handleGoogleAuth = () => {
-    // 실제 구글 OAuth 로직 구현 필요
-    console.log("Google OAuth");
-  };
 
   return (
     <div className="flex flex-col min-h-screen">
       {/* Navigation */}
       <header className="bg-background border-b border-primary/10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Logo size="md" rounded={true} />
+          <Logo size="md" />
           <nav className="hidden md:flex items-center space-x-6">
             <Link
               href="/explore"
@@ -72,20 +40,13 @@ export default function HomePage() {
             </Link>
           </nav>
           <div className="flex items-center space-x-4">
-            <Button
-              variant="outline"
-              onClick={() => setShowLoginModal(true)}
-              className="hidden md:inline-flex"
-            >
-              Log in
-            </Button>
-            <Button onClick={() => setShowSignupModal(true)}>Sign up</Button>
+            <LoginButton setShowLoginModal={setShowLoginModal} />
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-primary to-secondary text-primary-foreground">
+      <section className="relative bg-gradient-to-r from-[#395030] to-[#adc1a5] text-primary-foreground">
         <div className="container mx-auto px-4 py-20 md:py-32">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
@@ -146,7 +107,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-10">
             {/* Feature 1 */}
             <div className="flex flex-col items-center text-center">
-              <div className="bg-secondary/20 p-4 rounded-full mb-6">
+              <div className="bg-[#d1e2ca] p-4 rounded-full mb-6">
                 <Users className="h-10 w-10 text-foreground" />
               </div>
               <h3 className="text-xl font-bold mb-3">Group Planning</h3>
@@ -158,7 +119,7 @@ export default function HomePage() {
 
             {/* Feature 2 */}
             <div className="flex flex-col items-center text-center">
-              <div className="bg-accent/20 p-4 rounded-full mb-6">
+              <div className="bg-[#d1e2ca] p-4 rounded-full mb-6">
                 <Globe className="h-10 w-10 text-foreground" />
               </div>
               <h3 className="text-xl font-bold mb-3">Cultural Insights</h3>
@@ -170,7 +131,7 @@ export default function HomePage() {
 
             {/* Feature 3 */}
             <div className="flex flex-col items-center text-center">
-              <div className="bg-primary/30 p-4 rounded-full mb-6">
+              <div className="bg-[#d1e2ca] p-4 rounded-full mb-6">
                 <Map className="h-10 w-10 text-foreground" />
               </div>
               <h3 className="text-xl font-bold mb-3">Local Discoveries</h3>
@@ -196,8 +157,8 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               size="lg"
-              className="bg-accent hover:bg-accent/90 text-accent-foreground"
-              onClick={() => setShowSignupModal(true)}
+              className="bg-gray-200 hover:bg-accent/90 text-accent-foreground"
+              onClick={() => setShowLoginModal(true)}
             >
               Get Started for Free
             </Button>
@@ -208,178 +169,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Login Modal */}
-      <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle className="text-center text-2xl">
-              Log in to TravelTogether
-            </DialogTitle>
-            <DialogDescription className="text-center">
-              Welcome back! Enter your details to continue.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleLogin} className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <Label htmlFor="password">Password</Label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs text-accent hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full">
-              Log in
-            </Button>
-          </form>
-
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <Separator className="w-full" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-background px-2 text-sm text-muted-foreground">
-                or continue with
-              </span>
-            </div>
-          </div>
-
-          <Button
-            variant="outline"
-            className="w-full flex items-center gap-2"
-            onClick={handleGoogleAuth}
-          >
-            <GoogleIcon className="h-5 w-5" />
-            <span>Google</span>
-          </Button>
-
-          <div className="text-center text-sm mt-4">
-            <span className="text-muted-foreground">
-              Don't have an account?
-            </span>{" "}
-            <button
-              className="text-accent hover:underline font-medium"
-              onClick={() => {
-                setShowLoginModal(false);
-                setShowSignupModal(true);
-              }}
-            >
-              Sign up
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Signup Modal */}
-      <Dialog open={showSignupModal} onOpenChange={setShowSignupModal}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle className="text-center text-2xl">
-              Create an account
-            </DialogTitle>
-            <DialogDescription className="text-center">
-              Join TravelTogether to start planning your next adventure.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSignup} className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                placeholder="John Doe"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="signup-email">Email</Label>
-              <Input
-                id="signup-email"
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="signup-password">Password</Label>
-              <Input
-                id="signup-password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <p className="text-xs text-muted-foreground">
-                Password must be at least 8 characters long.
-              </p>
-            </div>
-            <Button type="submit" className="w-full">
-              Sign up
-            </Button>
-          </form>
-
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <Separator className="w-full" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-background px-2 text-sm text-muted-foreground">
-                or continue with
-              </span>
-            </div>
-          </div>
-
-          <Button
-            variant="outline"
-            className="w-full flex items-center gap-2"
-            onClick={handleGoogleAuth}
-          >
-            <GoogleIcon className="h-5 w-5" />
-            <span>Google</span>
-          </Button>
-
-          <div className="text-center text-sm mt-4">
-            <span className="text-muted-foreground">
-              Already have an account?
-            </span>{" "}
-            <button
-              className="text-accent hover:underline font-medium"
-              onClick={() => {
-                setShowSignupModal(false);
-                setShowLoginModal(true);
-              }}
-            >
-              Log in
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <LoginModal
+        showLoginModal={showLoginModal}
+        setShowLoginModal={setShowLoginModal}
+      />
     </div>
   );
 }
