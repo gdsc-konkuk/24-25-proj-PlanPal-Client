@@ -97,7 +97,8 @@ export default function DashboardPage() {
         from: new Date(2023, 3, 1),
         to: new Date(2023, 3, 10),
       },
-      coverImage: "/placeholder.svg?height=200&width=400",
+      coverImage:
+        "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       participants: [
         {
           id: "user1",
@@ -137,7 +138,8 @@ export default function DashboardPage() {
         from: new Date(2023, 6, 15),
         to: new Date(2023, 7, 5),
       },
-      coverImage: "/placeholder.svg?height=200&width=400",
+      coverImage:
+        "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       participants: [
         {
           id: "user1",
@@ -172,7 +174,8 @@ export default function DashboardPage() {
         from: new Date(2023, 8, 22),
         to: new Date(2023, 8, 25),
       },
-      coverImage: "/placeholder.svg?height=200&width=400",
+      coverImage:
+        "https://images.unsplash.com/photo-1701678638937-7d538a9f0211?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       participants: [
         {
           id: "user1",
@@ -277,21 +280,21 @@ export default function DashboardPage() {
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold">내 여행 계획</h1>
+        <h1 className="text-2xl font-bold">My Trip Plans</h1>
         {/* 버튼과 Dialog를 분리하여 직접 상태 관리 */}
         <Button
           className="bg-accent text-accent-foreground hover:bg-accent/90"
           onClick={openCreateDialog}
         >
-          <Plus className="h-4 w-4 mr-2" /> 새 여행 만들기
+          <Plus className="h-4 w-4 mr-2" /> Add New Trip Plan
         </Button>
 
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogContent className="sm:max-w-[600px] max-h-[calc(100vh-40px)] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>새 여행 계획 만들기</DialogTitle>
+              <DialogTitle>Add New Trip Plan</DialogTitle>
               <DialogDescription>
-                새로운 여행 계획을 만들고 친구들과 함께 준비해보세요.
+                Make a new travel plan and prepare it with your friends.
               </DialogDescription>
             </DialogHeader>
 
@@ -302,12 +305,12 @@ export default function DashboardPage() {
               className="mt-4"
             >
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="basic">기본 정보</TabsTrigger>
+                <TabsTrigger value="basic">Default information</TabsTrigger>
                 <TabsTrigger
                   value="invite"
                   disabled={!newTravelName || newTravelParticipants < 1}
                 >
-                  초대 및 시작
+                  Invitation and Start
                 </TabsTrigger>
               </TabsList>
 
@@ -316,19 +319,19 @@ export default function DashboardPage() {
                   {/* 필수 정보 섹션 */}
                   <div>
                     <h3 className="text-sm font-medium mb-2 flex items-center">
-                      필수 정보
+                      Required information
                       <Badge variant="secondary" className="ml-2">
-                        필수
+                        Required
                       </Badge>
                     </h3>
                     <Separator className="mb-4" />
 
                     <div className="grid gap-4">
                       <div className="grid gap-2">
-                        <Label htmlFor="travel-name">여행 방 이름</Label>
+                        <Label htmlFor="travel-name">Name of trip chat</Label>
                         <Input
                           id="travel-name"
-                          placeholder="예: 도쿄 벚꽃 여행"
+                          placeholder="Example: Jeju Island Healing Trip"
                           value={newTravelName}
                           onChange={(e) => setNewTravelName(e.target.value)}
                           required
@@ -341,7 +344,7 @@ export default function DashboardPage() {
                           id="travel-participants"
                           type="number"
                           min="1"
-                          placeholder="예: 4"
+                          placeholder="Example: 4"
                           value={newTravelParticipants}
                           onChange={(e) =>
                             setNewTravelParticipants(
@@ -357,9 +360,9 @@ export default function DashboardPage() {
                   {/* 선택 정보 섹션 */}
                   <div>
                     <h3 className="text-sm font-medium mb-2 flex items-center">
-                      선택 정보
+                      Optional information
                       <Badge variant="outline" className="ml-2">
-                        선택
+                        Optional
                       </Badge>
                     </h3>
                     <Separator className="mb-4" />
@@ -367,7 +370,7 @@ export default function DashboardPage() {
                     <div className="grid gap-4">
                       {/* 목적지 섹션 */}
                       <div className="grid gap-2">
-                        <Label className="mb-1">목적지</Label>
+                        <Label className="mb-1">Destination</Label>
 
                         {/* 추가된 목적지 목록 */}
                         {destinations.length > 0 && (
@@ -379,7 +382,7 @@ export default function DashboardPage() {
                               >
                                 <span>
                                   {dest.country}
-                                  {dest.region && ` - ${dest.region}`}
+                                  {dest.region && ` · ${dest.region}`}
                                 </span>
                                 <Button
                                   variant="ghost"
@@ -398,11 +401,11 @@ export default function DashboardPage() {
                         <div className="flex gap-2 items-end">
                           <div className="grid gap-1 flex-1">
                             <Label htmlFor="travel-country" className="text-xs">
-                              국가
+                              Country
                             </Label>
                             <Input
                               id="travel-country"
-                              placeholder="예: 일본"
+                              placeholder="Example: South Korea"
                               value={newCountry}
                               onChange={(e) => setNewCountry(e.target.value)}
                               className="h-9"
@@ -410,11 +413,11 @@ export default function DashboardPage() {
                           </div>
                           <div className="grid gap-1 flex-1">
                             <Label htmlFor="travel-region" className="text-xs">
-                              지역 (선택)
+                              Region (optional)
                             </Label>
                             <Input
                               id="travel-region"
-                              placeholder="예: 도쿄, 교토"
+                              placeholder="Example: Jeju Island"
                               value={newRegion}
                               onChange={(e) => setNewRegion(e.target.value)}
                               className="h-9"
@@ -429,14 +432,14 @@ export default function DashboardPage() {
                             className="h-9"
                           >
                             <Plus className="h-4 w-4 mr-1" />
-                            추가
+                            Add
                           </Button>
                         </div>
                       </div>
 
                       {/* 여행 기간 */}
                       <div className="grid gap-2">
-                        <Label>여행 기간</Label>
+                        <Label>Travel period</Label>
                         <DatePickerWithRange
                           date={newTravelDate}
                           setDate={setNewTravelDate}
@@ -445,7 +448,7 @@ export default function DashboardPage() {
 
                       {/* 대표 이미지 */}
                       <div className="grid gap-2">
-                        <Label>대표 이미지</Label>
+                        <Label>Thumbnail</Label>
                         <div className="border rounded-md p-4">
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex gap-4">
@@ -459,7 +462,7 @@ export default function DashboardPage() {
                                 size="sm"
                                 onClick={() => setCoverImageType("ai")}
                               >
-                                AI 생성 이미지
+                                AI-generated images
                               </Button>
                               <Button
                                 type="button"
@@ -471,7 +474,7 @@ export default function DashboardPage() {
                                 size="sm"
                                 onClick={() => setCoverImageType("upload")}
                               >
-                                직접 업로드
+                                Upload directly
                               </Button>
                             </div>
                           </div>
@@ -479,7 +482,7 @@ export default function DashboardPage() {
                           <div className="relative aspect-video rounded-md overflow-hidden border">
                             <Image
                               src={coverImageUrl || "/placeholder.svg"}
-                              alt="여행 대표 이미지"
+                              alt="Travel Thumbnail Image"
                               fill
                               className="object-cover"
                             />
@@ -493,15 +496,14 @@ export default function DashboardPage() {
                                 className="w-full"
                               >
                                 <ImageIcon className="h-4 w-4 mr-2" />
-                                이미지 업로드
+                                Image Upload
                               </Button>
                             </div>
                           )}
 
                           {coverImageType === "ai" && (
                             <div className="mt-2 text-center text-sm text-muted-foreground">
-                              여행 정보를 바탕으로 AI가 자동으로 이미지를
-                              생성합니다.
+                              AI image selected based on travel information
                             </div>
                           )}
                         </div>
@@ -510,11 +512,11 @@ export default function DashboardPage() {
                       {/* 여행 설명 */}
                       <div className="grid gap-2">
                         <Label htmlFor="travel-description">
-                          여행 설명 (선택사항)
+                          Travel Description (optional)
                         </Label>
                         <Textarea
                           id="travel-description"
-                          placeholder="여행에 대한 간단한 설명을 입력하세요."
+                          placeholder="Enter a brief description of a trip."
                           value={newTravelDescription}
                           onChange={(e) =>
                             setNewTravelDescription(e.target.value)
@@ -530,7 +532,7 @@ export default function DashboardPage() {
                     variant="outline"
                     onClick={() => setIsCreateDialogOpen(false)}
                   >
-                    취소
+                    Cancel
                   </Button>
                   <Button
                     onClick={() => {
@@ -539,7 +541,7 @@ export default function DashboardPage() {
                     }}
                     disabled={!newTravelName || newTravelParticipants < 1}
                   >
-                    다음
+                    Next
                   </Button>
                 </div>
               </TabsContent>
@@ -549,10 +551,10 @@ export default function DashboardPage() {
                   {/* 초대 링크 섹션 */}
                   <div className="bg-muted/50 rounded-lg p-6 text-center">
                     <h3 className="text-lg font-medium mb-2">
-                      여행 계획이 생성되었습니다!
+                      Your travel plan has been created!
                     </h3>
                     <p className="text-muted-foreground mb-6">
-                      아래 링크를 공유하여 친구들을 초대하세요.
+                      Please share the link below to invite your friends.
                     </p>
 
                     <div className="flex items-center gap-2 mb-6">
@@ -584,7 +586,7 @@ export default function DashboardPage() {
 
                     <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                       <Users className="h-4 w-4" />
-                      <span>예상 인원: {newTravelParticipants}명</span>
+                      <span>number of people: {newTravelParticipants}</span>
                     </div>
                   </div>
 
@@ -647,13 +649,13 @@ export default function DashboardPage() {
                     variant="outline"
                     onClick={() => setActiveTab("basic")}
                   >
-                    이전
+                    Prev
                   </Button>
                   <Button
                     className="bg-accent text-accent-foreground hover:bg-accent/90"
                     onClick={handleStartTravel}
                   >
-                    여행 시작하기
+                    Start Trip Plan!
                   </Button>
                 </div>
               </TabsContent>
@@ -747,7 +749,7 @@ export default function DashboardPage() {
                 className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
                 onClick={() => router.push(`/chat?id=${room.id}`)}
               >
-                채팅방 입장
+                Enter the chat
               </Button>
             </CardFooter>
           </Card>
