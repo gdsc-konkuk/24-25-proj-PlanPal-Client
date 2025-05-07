@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Logo } from "./logo";
 
@@ -22,31 +24,31 @@ export const Footer = () => {
               <h4 className="text-lg font-semibold mb-4">Product</h4>
               <ul className="space-y-2">
                 <li>
-                  <a
+                  <Link
                     href="#"
                     onClick={(e) => e.preventDefault()}
                     className="text-primary-foreground/70 hover:text-primary-foreground cursor-pointer"
                   >
                     Features
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
+                  <Link
                     href="#"
                     onClick={(e) => e.preventDefault()}
                     className="text-primary-foreground/70 hover:text-primary-foreground cursor-pointer"
                   >
                     Pricing
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
+                  <Link
                     href="#"
                     onClick={(e) => e.preventDefault()}
                     className="text-primary-foreground/70 hover:text-primary-foreground cursor-pointer"
                   >
                     FAQ
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -54,31 +56,31 @@ export const Footer = () => {
               <h4 className="text-lg font-semibold mb-4">Company</h4>
               <ul className="space-y-2">
                 <li>
-                  <a
+                  <Link
                     href="#"
                     onClick={(e) => e.preventDefault()}
                     className="text-primary-foreground/70 hover:text-primary-foreground cursor-pointer"
                   >
                     About Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
+                  <Link
                     href="#"
                     onClick={(e) => e.preventDefault()}
                     className="text-primary-foreground/70 hover:text-primary-foreground cursor-pointer"
                   >
                     Blog
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
+                  <Link
                     href="#"
                     onClick={(e) => e.preventDefault()}
                     className="text-primary-foreground/70 hover:text-primary-foreground cursor-pointer"
                   >
                     Careers
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -86,31 +88,31 @@ export const Footer = () => {
               <h4 className="text-lg font-semibold mb-4">Legal</h4>
               <ul className="space-y-2">
                 <li>
-                  <a
+                  <Link
                     href="#"
                     onClick={(e) => e.preventDefault()}
                     className="text-primary-foreground/70 hover:text-primary-foreground cursor-pointer"
                   >
                     Privacy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
+                  <Link
                     href="#"
                     onClick={(e) => e.preventDefault()}
                     className="text-primary-foreground/70 hover:text-primary-foreground cursor-pointer"
                   >
                     Terms
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
+                  <Link
                     href="#"
                     onClick={(e) => e.preventDefault()}
                     className="text-primary-foreground/70 hover:text-primary-foreground cursor-pointer"
                   >
                     Cookies
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -126,38 +128,38 @@ export const Footer = () => {
           <div className="flex flex-wrap justify-center gap-4 mt-4">
             <span>Made by</span>
             <span className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-              <a
+              <Link
                 href="https://github.com/MinboyKim"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center hover:text-primary-foreground"
               >
                 <span>Dongmin Kim</span>
-              </a>
-              <a
+              </Link>
+              <Link
                 href="https://github.com/Turtle-Hwan"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center hover:text-primary-foreground"
               >
                 <span>Jihwan Kim</span>
-              </a>
-              <a
+              </Link>
+              <Link
                 href="https://github.com/yunuo46"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center hover:text-primary-foreground"
               >
                 <span>Hyunwoo Song</span>
-              </a>
-              <a
+              </Link>
+              <Link
                 href="https://github.com/drbug2000"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center hover:text-primary-foreground"
               >
                 <span>Sangjune Kim</span>
-              </a>
+              </Link>
             </span>
           </div>
         </div>
