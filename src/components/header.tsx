@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/logo";
@@ -15,6 +15,7 @@ import {
   ListIcon,
   MessageCircleIcon,
 } from "lucide-react";
+import { LoginModal } from "@/app/modules/landing/ui/components/login-modal";
 
 type NavItem = {
   href: string;
@@ -53,15 +54,15 @@ export function Header({
   travelId,
   onBackClick,
   panelControls,
-  setShowLoginModal,
 }: HeaderProps) {
   const pathname = usePathname();
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   return (
     <header className="bg-background border-b border-primary/10">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Logo size="md" rounded={true} />
-        <nav className="hidden md:flex items-center space-x-6">
+        <nav className="md:flex items-center space-x-6">
           {DEFAULT_NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
@@ -86,10 +87,15 @@ export function Header({
               </AvatarFallback>
             </Avatar>
           ) : (
-            <>login</>
+            <LoginButton setShowLoginModal={setShowLoginModal} />
           )}
         </div>
       </div>
+
+      <LoginModal
+        showLoginModal={showLoginModal}
+        setShowLoginModal={setShowLoginModal}
+      />
     </header>
   );
 }

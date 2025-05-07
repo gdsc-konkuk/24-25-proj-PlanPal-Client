@@ -32,10 +32,10 @@ export function LoginModal({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl">
-            Log in to TravelTogether
+            Log in to the PlanPal
           </DialogTitle>
           <DialogDescription className="text-center">
-            Welcome back! Enter your details to continue.
+            Welcome! Enter with Google your details to continue.
           </DialogDescription>
         </DialogHeader>
 

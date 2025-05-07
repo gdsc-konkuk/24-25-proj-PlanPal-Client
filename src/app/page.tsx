@@ -1,50 +1,17 @@
 "use client";
 
-import type React from "react";
+import React from "react";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Globe, Users, Map } from "lucide-react";
-import { Logo } from "@/components/logo";
-import { useState } from "react";
 import { LoginModal } from "./modules/landing/ui/components/login-modal";
-import { LoginButton } from "@/components/login-button";
 
 export default function HomePage() {
-  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = React.useState(false);
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Navigation */}
-      <header className="bg-background border-b border-primary/10">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Logo size="md" />
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link
-              href="/explore"
-              className="text-foreground hover:text-foreground/80"
-            >
-              Explore
-            </Link>
-            <Link
-              href="/dashboard"
-              className="text-foreground hover:text-foreground/80"
-            >
-              My Trips
-            </Link>
-            <Link
-              href="/about"
-              className="text-foreground hover:text-foreground/80"
-            >
-              About
-            </Link>
-          </nav>
-          <div className="flex items-center space-x-4">
-            <LoginButton setShowLoginModal={setShowLoginModal} />
-          </div>
-        </div>
-      </header>
-
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-[#395030] to-[#adc1a5] text-primary-foreground">
         <div className="container mx-auto px-4 py-20 md:py-32">
