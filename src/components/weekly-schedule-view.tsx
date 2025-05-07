@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   format,
   addDays,
@@ -14,43 +14,37 @@ import {
   addHours,
   isBefore,
   isAfter,
-} from "date-fns"
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import { AddEventForm } from "./add-event-form"
+} from "date-fns";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { AddEventForm } from "./add-event-form";
+import { LikedPlace } from "@/store/liked-place-store";
 
 type ScheduleItem = {
-  id: string
-  placeId?: string
-  title: string
-  date: Date
-  startTime: Date
-  endTime: Date
-  type: "식사" | "관광" | "숙박" | "이동" | "기타"
-  description?: string
-  color?: string
-}
-
-type Place = {
-  id: string
-  name: string
-  address?: string
-  [key: string]: any
-}
+  id: string;
+  placeId?: string;
+  title: string;
+  date: Date;
+  startTime: Date;
+  endTime: Date;
+  type: "식사" | "관광" | "숙박" | "이동" | "기타";
+  description?: string;
+  color?: string;
+};
 
 interface WeeklyScheduleViewProps {
-  scheduleItems: ScheduleItem[]
-  places: Place[]
-  onAddEvent: (event: Omit<ScheduleItem, "id" | "color">) => void
+  scheduleItems: ScheduleItem[];
+  places: LikedPlace[];
+  onAddEvent: (event: Omit<ScheduleItem, "id" | "color">) => void;
 }
 
 // 시간 간격 (30분 단위)
 const HOUR_INTERVALS = Array.from({ length: 48 }, (_, i) => {
-  const hour = Math.floor(i / 2)
-  const minute = (i % 2) * 30
-  return { hour, minute }
-})
+  const hour = Math.floor(i / 2);
+  const minute = (i % 2) * 30;
+  return { hour, minute };
+});
 
 // 이벤트 유형별 색상
 const TYPE_COLORS = {
@@ -59,56 +53,64 @@ const TYPE_COLORS = {
   숙박: "#60A5FA",
   이동: "#A78BFA",
   기타: "#94A3B8",
-}
+};
 
-export function WeeklyScheduleView({ scheduleItems, places, onAddEvent }: WeeklyScheduleViewProps) {
-  const [weekStart, setWeekStart] = useState<Date>(startOfWeek(new Date(), { weekStartsOn: 1 }))
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
-  const [showAddEventDialog, setShowAddEventDialog] = useState(false)
+export function WeeklyScheduleView({
+  scheduleItems,
+  places,
+  onAddEvent,
+}: WeeklyScheduleViewProps) {
+  const [weekStart, setWeekStart] = useState<Date>(
+    startOfWeek(new Date(), { weekStartsOn: 1 })
+  );
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [showAddEventDialog, setShowAddEventDialog] = useState(false);
 
   // 현재 주의 날짜들
   const daysOfWeek = eachDayOfInterval({
     start: weekStart,
     end: endOfWeek(weekStart, { weekStartsOn: 1 }),
-  })
+  });
 
   // 이전/다음 주로 이동
   const goToPreviousWeek = () => {
-    setWeekStart(subWeeks(weekStart, 1))
-  }
+    setWeekStart(subWeeks(weekStart, 1));
+  };
 
   const goToNextWeek = () => {
-    setWeekStart(addWeeks(weekStart, 1))
-  }
+    setWeekStart(addWeeks(weekStart, 1));
+  };
 
   // 특정 시간에 해당하는 일정 찾기
   const getEventsForTimeSlot = (day: Date, hour: number, minute: number) => {
-    const timeSlot = new Date(day)
-    timeSlot.setHours(hour, minute, 0, 0)
+    const timeSlot = new Date(day);
+    timeSlot.setHours(hour, minute, 0, 0);
 
     return scheduleItems.filter((event) => {
-      const eventDay = new Date(event.date)
-      eventDay.setHours(0, 0, 0, 0)
-      const dayMatches = isSameDay(day, eventDay)
+      const eventDay = new Date(event.date);
+      eventDay.setHours(0, 0, 0, 0);
+      const dayMatches = isSameDay(day, eventDay);
 
-      if (!dayMatches) return false
+      if (!dayMatches) return false;
 
-      const slotStart = new Date(timeSlot)
-      const slotEnd = addHours(slotStart, 0.5) // 30분 간격
+      const slotStart = new Date(timeSlot);
+      const slotEnd = addHours(slotStart, 0.5); // 30분 간격
 
       // 이벤트가 이 시간 슬롯에 포함되는지 확인
       return (
-        (isBefore(event.startTime, slotEnd) || isSameDay(event.startTime, slotEnd)) &&
-        (isAfter(event.endTime, slotStart) || isSameDay(event.endTime, slotStart))
-      )
-    })
-  }
+        (isBefore(event.startTime, slotEnd) ||
+          isSameDay(event.startTime, slotEnd)) &&
+        (isAfter(event.endTime, slotStart) ||
+          isSameDay(event.endTime, slotStart))
+      );
+    });
+  };
 
   // 새 일정 추가
   const handleAddEvent = (eventData: Omit<ScheduleItem, "id" | "color">) => {
-    onAddEvent(eventData)
-    setShowAddEventDialog(false)
-  }
+    onAddEvent(eventData);
+    setShowAddEventDialog(false);
+  };
 
   return (
     <div className="bg-background rounded-lg p-4 shadow-sm h-full flex flex-col">
@@ -119,7 +121,8 @@ export function WeeklyScheduleView({ scheduleItems, places, onAddEvent }: Weekly
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <span className="text-sm">
-            {format(weekStart, "MMM d")} - {format(addDays(weekStart, 6), "MMM d, yyyy")}
+            {format(weekStart, "MMM d")} -{" "}
+            {format(addDays(weekStart, 6), "MMM d, yyyy")}
           </span>
           <Button variant="outline" size="icon" onClick={goToNextWeek}>
             <ChevronRight className="h-4 w-4" />
@@ -129,14 +132,18 @@ export function WeeklyScheduleView({ scheduleItems, places, onAddEvent }: Weekly
 
       {/* 요일 헤더 */}
       <div className="grid grid-cols-8 gap-1 mb-2 sticky top-0 bg-background z-10">
-        <div className="text-center text-xs font-medium text-muted-foreground p-1 border-r">시간</div>
+        <div className="text-center text-xs font-medium text-muted-foreground p-1 border-r">
+          시간
+        </div>
         {daysOfWeek.map((day) => (
           <Button
             key={day.toISOString()}
             variant={isSameDay(day, selectedDate) ? "default" : "outline"}
             className={cn(
               "h-10 p-0 text-xs",
-              isSameDay(day, new Date()) && !isSameDay(day, selectedDate) && "border-primary text-primary",
+              isSameDay(day, new Date()) &&
+                !isSameDay(day, selectedDate) &&
+                "border-primary text-primary"
             )}
             onClick={() => setSelectedDate(day)}
           >
@@ -158,7 +165,9 @@ export function WeeklyScheduleView({ scheduleItems, places, onAddEvent }: Weekly
                 key={`time-${hour}-${minute}`}
                 className={cn(
                   "text-xs text-right pr-2 h-12 flex items-center justify-end border-r",
-                  minute === 0 ? "font-medium" : "text-muted-foreground text-[10px]",
+                  minute === 0
+                    ? "font-medium"
+                    : "text-muted-foreground text-[10px]"
                 )}
               >
                 {minute === 0 && `${hour}:00`}
@@ -170,30 +179,35 @@ export function WeeklyScheduleView({ scheduleItems, places, onAddEvent }: Weekly
           {daysOfWeek.map((day) => (
             <div key={day.toISOString()} className="space-y-1 relative">
               {HOUR_INTERVALS.map(({ hour, minute }, index) => {
-                const events = getEventsForTimeSlot(day, hour, minute)
+                const events = getEventsForTimeSlot(day, hour, minute);
                 return (
                   <div
                     key={`slot-${day.toISOString()}-${hour}-${minute}`}
                     className={cn(
                       "h-12 border border-dashed border-border/40 rounded-sm p-0.5",
-                      events.length > 0 && "bg-muted/30",
+                      events.length > 0 && "bg-muted/30"
                     )}
                   >
                     {events.map((event) => {
                       // 이벤트가 이 시간 슬롯에서 시작하는지 확인
                       const eventStartsHere =
                         event.startTime.getHours() === hour &&
-                        Math.floor(event.startTime.getMinutes() / 30) * 30 === minute
+                        Math.floor(event.startTime.getMinutes() / 30) * 30 ===
+                          minute;
 
-                      if (!eventStartsHere) return null
+                      if (!eventStartsHere) return null;
 
                       // 이벤트 지속 시간 계산 (30분 슬롯 단위)
-                      const startSlot = event.startTime.getHours() * 2 + Math.floor(event.startTime.getMinutes() / 30)
-                      const endSlot = event.endTime.getHours() * 2 + Math.floor(event.endTime.getMinutes() / 30)
-                      const durationInSlots = endSlot - startSlot
+                      const startSlot =
+                        event.startTime.getHours() * 2 +
+                        Math.floor(event.startTime.getMinutes() / 30);
+                      const endSlot =
+                        event.endTime.getHours() * 2 +
+                        Math.floor(event.endTime.getMinutes() / 30);
+                      const durationInSlots = endSlot - startSlot;
 
                       // 최소 높이 보장
-                      const heightInSlots = Math.max(1, durationInSlots)
+                      const heightInSlots = Math.max(1, durationInSlots);
 
                       return (
                         <div
@@ -209,15 +223,18 @@ export function WeeklyScheduleView({ scheduleItems, places, onAddEvent }: Weekly
                             zIndex: 5,
                           }}
                         >
-                          <div className="font-medium truncate">{event.title}</div>
+                          <div className="font-medium truncate">
+                            {event.title}
+                          </div>
                           <div className="text-[10px] text-muted-foreground truncate">
-                            {format(event.startTime, "HH:mm")} - {format(event.endTime, "HH:mm")}
+                            {format(event.startTime, "HH:mm")} -{" "}
+                            {format(event.endTime, "HH:mm")}
                           </div>
                         </div>
-                      )
+                      );
                     })}
                   </div>
-                )
+                );
               })}
             </div>
           ))}
@@ -226,7 +243,11 @@ export function WeeklyScheduleView({ scheduleItems, places, onAddEvent }: Weekly
 
       {/* 일정 추가 버튼 */}
       <div className="mt-4 flex justify-end">
-        <Button size="sm" onClick={() => setShowAddEventDialog(true)} className="gap-1">
+        <Button
+          size="sm"
+          onClick={() => setShowAddEventDialog(true)}
+          className="gap-1"
+        >
           <Plus className="h-4 w-4" /> 일정 추가
         </Button>
       </div>
@@ -243,6 +264,5 @@ export function WeeklyScheduleView({ scheduleItems, places, onAddEvent }: Weekly
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
-
