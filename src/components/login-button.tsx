@@ -26,7 +26,7 @@ export function LoginButton({ setShowLoginModal }: LoginButtonProps) {
   return (
     <Button
       variant="outline"
-      className="hidden md:inline-flex"
+      className="md:inline-flex"
       onClick={accessToken ? handleLogout : handleLogin}
     >
       {accessToken ? "Log out" : "Log in"}
