@@ -4,17 +4,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/logo";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LoginButton } from "@/components/login-button";
-import {
-  ArrowLeft,
-  EyeIcon,
-  EyeOffIcon,
-  MapIcon,
-  ListIcon,
-  MessageCircleIcon,
-} from "lucide-react";
 import { LoginModal } from "@/app/modules/landing/ui/components/login-modal";
 
 type NavItem = {
@@ -23,23 +14,10 @@ type NavItem = {
 };
 
 type HeaderProps = {
-  variant?: "default" | "chat";
   currentUser?: {
     name?: string;
     image?: string;
   };
-  // For chat header only
-  travelId?: string;
-  onBackClick?: () => void;
-  panelControls?: {
-    leftPanelVisible: boolean;
-    middlePanelVisible: boolean;
-    rightPanelVisible: boolean;
-    toggleLeftPanel: () => void;
-    toggleMiddlePanel: () => void;
-    toggleRightPanel: () => void;
-  };
-  setShowLoginModal?: (show: boolean) => void;
 };
 
 const DEFAULT_NAV_ITEMS: NavItem[] = [
@@ -48,15 +26,13 @@ const DEFAULT_NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "My Trips" },
 ];
 
-export function Header({
-  variant = "default",
-  currentUser,
-  travelId,
-  onBackClick,
-  panelControls,
-}: HeaderProps) {
+export function Header({ currentUser }: HeaderProps) {
   const pathname = usePathname();
   const [showLoginModal, setShowLoginModal] = useState(false);
+
+  if (pathname === "/chat") {
+    return null; // Hide header on the chat page
+  }
 
   return (
     <header className="bg-background border-b border-primary/10">
