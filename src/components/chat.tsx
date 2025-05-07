@@ -57,7 +57,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { WeeklyScheduleView } from "@/components/weekly-schedule-view";
-import { ResizableLayout } from "@/components/resizable-layout";
+import { ResizableLayout } from "@/components/ui/resizable-layout";
 
 type MessageType = {
   id: string;
