@@ -4,20 +4,16 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/logo";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { LoginButton } from "@/components/login-button";
 import { LoginModal } from "@/app/modules/landing/ui/components/login-modal";
+import { useAuthStore } from "@/store/auth-store";
+import { useRouter } from "next/navigation";
+import { logoutRequest } from "@/app/modules/auth/api/logout";
 
 type NavItem = {
   href: string;
   label: string;
-};
-
-type HeaderProps = {
-  currentUser?: {
-    name?: string;
-    image?: string;
-  };
 };
 
 const DEFAULT_NAV_ITEMS: NavItem[] = [
@@ -26,9 +22,13 @@ const DEFAULT_NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "My Trips" },
 ];
 
-export function Header({ currentUser }: HeaderProps) {
+export function Header() {
   const pathname = usePathname();
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const router = useRouter();
+
+  const currentUser = useAuthStore((state) => state.userName);
 
   if (pathname === "/chat") {
     return null; // Hide header on the chat page
@@ -53,15 +53,34 @@ export function Header({ currentUser }: HeaderProps) {
         </nav>
         <div className="flex items-center space-x-4">
           {currentUser ? (
-            <Avatar className="h-8 w-8">
-              <AvatarImage
-                src={currentUser.image || "/placeholder.svg?height=32&width=32"}
-                alt="User"
-              />
-              <AvatarFallback className="bg-accent/30 text-accent-foreground">
-                {currentUser.name?.[0] || "U"}
-              </AvatarFallback>
-            </Avatar>
+            <div className="relative">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="h-8 flex items-center justify-center px-3 border border-input rounded-md hover:bg-accent/10"
+              >
+                {currentUser.split(" ")[0] || "U"}
+              </button>
+
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-background border border-input rounded-md shadow-lg z-10 p-2">
+                  <div className="px-3 py-2 text-sm text-muted-foreground">
+                    log in as {currentUser}
+                  </div>
+                  <hr className="my-1 border-input" />
+                  <button
+                    onClick={async () => {
+                      setShowUserMenu(false);
+                      useAuthStore.setState({ accessToken: null });
+                      await logoutRequest();
+                      router.push("/");
+                    }}
+                    className="w-full text-left px-3 py-2 hover:bg-accent/10 rounded-md"
+                  >
+                    log out
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <LoginButton setShowLoginModal={setShowLoginModal} />
           )}
