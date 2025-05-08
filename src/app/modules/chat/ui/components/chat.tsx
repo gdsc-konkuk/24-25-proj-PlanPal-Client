@@ -40,7 +40,7 @@ import {
   EyeOffIcon,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
-import { GoogleMap } from "@/components/google-map";
+import { GoogleMap } from "@/app/modules/map/ui/components/google-map";
 import { format } from "date-fns";
 import Link from "next/link";
 import {
@@ -62,8 +62,8 @@ import {
   IconType,
   LikedPlace,
   useLikedPlaces,
-} from "@/store/liked-place-store";
-import { useMapStore } from "@/store/map-store";
+} from "@/app/modules/map/store/liked-place-store";
+import { useMapStore } from "@/app/modules/map/store/map-store";
 import { cn } from "@/lib/utils";
 
 type MessageType = {

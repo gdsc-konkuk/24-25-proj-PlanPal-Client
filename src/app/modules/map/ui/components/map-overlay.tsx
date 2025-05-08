@@ -2,10 +2,13 @@
 
 import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import { createCustomOverlay } from "@/lib/create-custom-overlay";
+import { createCustomOverlay } from "@/app/modules/map/lib/create-custom-overlay";
 import { HeartIcon, HomeIcon, PhoneIcon, StarIcon, XIcon } from "lucide-react";
-import { IconType, useLikedPlaces } from "@/store/liked-place-store";
-import { useMapStore } from "@/store/map-store";
+import {
+  IconType,
+  useLikedPlaces,
+} from "@/app/modules/map/store/liked-place-store";
+import { useMapStore } from "@/app/modules/map/store/map-store";
 
 type MapOverlayProps = {
   position: google.maps.LatLng;

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { MapOverlay } from "./map-overlay";
-import { useMapStore } from "@/store/map-store";
+import { useMapStore } from "@/app/modules/map/store/map-store";
 
 export function GoogleMap() {
   const mapRef = useRef<HTMLDivElement>(null);
