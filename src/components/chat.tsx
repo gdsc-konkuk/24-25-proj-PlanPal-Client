@@ -64,6 +64,7 @@ import {
   useLikedPlaces,
 } from "@/store/liked-place-store";
 import { useMapStore } from "@/store/map-store";
+import { cn } from "@/lib/utils";
 
 type MessageType = {
   id: string;
@@ -458,41 +459,51 @@ export default function Chat() {
 
   // 왼쪽 패널 컨텐츠
   const leftPanelContent = (
-    <div className="h-full flex flex-col border-r border-primary/10">
-      <Tabs
-        defaultValue="map"
-        value={activeLeftTab}
-        onValueChange={setActiveLeftTab}
-        className="h-full flex flex-col"
-      >
-        <div className="border-b border-primary/10 px-4 py-2">
-          <TabsList className="w-full">
-            <TabsTrigger value="map" className="flex-1">
-              <Map className="h-4 w-4 mr-2" />
-              Map
-            </TabsTrigger>
-            <TabsTrigger value="calendar" className="flex-1">
-              <CalendarIcon className="h-4 w-4 mr-2" />
-              Calendar
-            </TabsTrigger>
-          </TabsList>
+    <Tabs
+      defaultValue="map"
+      value={activeLeftTab}
+      onValueChange={setActiveLeftTab}
+      className="h-full flex flex-col"
+    >
+      <div className="border-b border-primary/10 px-4 py-2">
+        <TabsList className="w-full">
+          <TabsTrigger value="map" className="flex-1">
+            <Map className="h-4 w-4 mr-2" />
+            Map
+          </TabsTrigger>
+          <TabsTrigger value="calendar" className="flex-1">
+            <CalendarIcon className="h-4 w-4 mr-2" />
+            Calendar
+          </TabsTrigger>
+        </TabsList>
+      </div>
+
+      <div className="flex-1 relative">
+        <div
+          className={cn("absolute inset-0 transition-opacity", {
+            "opacity-100 visible pointer-events-auto": activeLeftTab === "map",
+            "opacity-0 invisible pointer-events-none": activeLeftTab !== "map",
+          })}
+        >
+          <GoogleMap />
         </div>
 
-        <TabsContent value="map" className="flex-1 p-4 overflow-hidden">
-          <div className="h-full rounded-lg overflow-hidden">
-            <GoogleMap />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="calendar" className="flex-1 overflow-hidden">
+        <div
+          className={cn("absolute inset-0 transition-opacity", {
+            "opacity-100 visible pointer-events-auto":
+              activeLeftTab === "calendar",
+            "opacity-0 invisible pointer-events-none":
+              activeLeftTab !== "calendar",
+          })}
+        >
           <WeeklyScheduleView
             scheduleItems={scheduleItems}
             places={likedPlaces}
             onAddEvent={handleAddEvent}
           />
-        </TabsContent>
-      </Tabs>
-    </div>
+        </div>
+      </div>
+    </Tabs>
   );
 
   // 중앙 패널 컨텐츠
