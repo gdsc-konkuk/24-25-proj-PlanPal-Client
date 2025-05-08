@@ -29,6 +29,9 @@ export function GoogleMap() {
       const markerLib = (await loader.importLibrary(
         "marker"
       )) as google.maps.MarkerLibrary;
+      const placeLib = (await loader.importLibrary(
+        "places"
+      )) as google.maps.PlacesLibrary;
 
       setGoogleMaps(maps);
 

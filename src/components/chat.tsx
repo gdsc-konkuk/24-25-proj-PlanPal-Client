@@ -58,7 +58,11 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { WeeklyScheduleView } from "@/components/weekly-schedule-view";
 import { ResizableLayout } from "@/components/resizable-layout";
-import { LikedPlace, useLikedPlaces } from "@/store/liked-place-store";
+import {
+  IconType,
+  LikedPlace,
+  useLikedPlaces,
+} from "@/store/liked-place-store";
 import { useMapStore } from "@/store/map-store";
 
 type MessageType = {
@@ -155,8 +159,8 @@ export default function Chat() {
 
   const map = useMapStore((state) => state.map);
   const likedPlaces = useLikedPlaces((state) => state.likedPlaces);
-  const setIsConfirmed = useLikedPlaces((state) => state.setIsConfirmed);
-  const getIsConfirmed = useLikedPlaces((state) => state.getIsConfirmed);
+  const setIconType = useLikedPlaces((state) => state.setIconType);
+  const getIconType = useLikedPlaces((state) => state.getIconType);
   const getMarker = useLikedPlaces((state) => state.getMarker);
 
   // 패널 가시성 변경 핸들러 - 이 함수는 ResizableLayout에서만 호출되도록 수정
@@ -363,8 +367,8 @@ export default function Chat() {
 
   const toggleConfirmed = (place: LikedPlace) => {
     const placeId = place.placeId;
-    const isConfirmed = getIsConfirmed(placeId);
-    setIsConfirmed(placeId, !isConfirmed);
+    const isConfirmed = getIconType(placeId) === IconType.STAR;
+    setIconType(placeId, isConfirmed ? IconType.HEART : IconType.STAR);
     const marker = getMarker(placeId);
 
     const img = document.createElement("img");
@@ -379,7 +383,9 @@ export default function Chat() {
   const filteredPlaces = likedPlaces.filter((place) => {
     // First filter by confirmed/candidates tab
     const matchesTab =
-      activePlacesTab === "confirmed" ? place.isConfirmed : !place.isConfirmed;
+      activePlacesTab === "confirmed"
+        ? place.iconType === IconType.STAR
+        : place.iconType === IconType.HEART;
 
     // // Then apply additional filters
     // const matchesType = placeFilter === "all" || place.type === placeFilter;

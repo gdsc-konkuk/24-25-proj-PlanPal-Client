@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { createCustomOverlay } from "@/lib/create-custom-overlay";
 import { HeartIcon, HomeIcon, PhoneIcon, StarIcon, XIcon } from "lucide-react";
-import { useLikedPlaces } from "@/store/liked-place-store";
+import { IconType, useLikedPlaces } from "@/store/liked-place-store";
 import { useMapStore } from "@/store/map-store";
 
 type MapOverlayProps = {
@@ -36,7 +36,7 @@ export function MapOverlay({ position, placeInfo, onClose }: MapOverlayProps) {
         name: placeInfo.place.name || "Unknown",
         lat: position.lat(),
         lng: position.lng(),
-        isConfirmed: false,
+        iconType: IconType.HEART,
       });
 
       const img = document.createElement("img");
