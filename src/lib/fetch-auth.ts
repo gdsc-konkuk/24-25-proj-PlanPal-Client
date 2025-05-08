@@ -10,6 +10,10 @@ export async function fetchAuth(
   options?: FetchWithAuthOptions
 ): Promise<Response> {
   const { accessToken, setAccessToken } = useAuthStore.getState();
+  const url =
+    typeof input === "string" && !input.startsWith("http")
+      ? `${process.env.NEXT_PUBLIC_API_SERVER_URL}${input}`
+      : input;
 
   const authInit: RequestInit = {
     ...init,
@@ -19,7 +23,7 @@ export async function fetchAuth(
     },
   };
 
-  let res = await fetch(input, authInit);
+  let res = await fetch(url, authInit);
 
   if (res.status === 401) {
     try {
