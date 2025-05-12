@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Logo } from "./logo";
+import { Logo } from "../logo";
 
 export const Footer = () => {
   return (
@@ -25,40 +25,36 @@ export const Footer = () => {
               <ul className="space-y-2">
                 <li>
                   <Link
-                    href="#"
-                    onClick={(e) => e.preventDefault()}
+                    href="https://github.com/gdsc-konkuk/24-25-proj-PlanPal-Client"
                     className="text-primary-foreground/70 hover:text-primary-foreground cursor-pointer"
                   >
-                    Features
+                    Feature - Frontend
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="#"
-                    onClick={(e) => e.preventDefault()}
+                    href="https://github.com/gdsc-konkuk/24-25-proj-PlanPal-Server"
                     className="text-primary-foreground/70 hover:text-primary-foreground cursor-pointer"
                   >
-                    Pricing
+                    Feature - Backend
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="#"
-                    onClick={(e) => e.preventDefault()}
+                    href="https://github.com/gdsc-konkuk/24-25-proj-PlanPal-Chat"
                     className="text-primary-foreground/70 hover:text-primary-foreground cursor-pointer"
                   >
-                    FAQ
+                    Feature - AI
                   </Link>
                 </li>
               </ul>
             </div>
             <div>
-              <h4 className="text-lg font-semibold mb-4">Company</h4>
+              <h4 className="text-lg font-semibold mb-4">Team</h4>
               <ul className="space-y-2">
                 <li>
                   <Link
-                    href="#"
-                    onClick={(e) => e.preventDefault()}
+                    href="https://github.com/gdsc-konkuk"
                     className="text-primary-foreground/70 hover:text-primary-foreground cursor-pointer"
                   >
                     About Us
@@ -66,25 +62,23 @@ export const Footer = () => {
                 </li>
                 <li>
                   <Link
-                    href="#"
-                    onClick={(e) => e.preventDefault()}
+                    href="https://gdg.community.dev/gdg-on-campus-konkuk-university-seoul-south-korea/"
                     className="text-primary-foreground/70 hover:text-primary-foreground cursor-pointer"
                   >
-                    Blog
+                    GDGoC Konkuk
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="#"
-                    onClick={(e) => e.preventDefault()}
+                    href="https://www.linkedin.com/company/gdgoc-konkuk/"
                     className="text-primary-foreground/70 hover:text-primary-foreground cursor-pointer"
                   >
-                    Careers
+                    LinkedIn
                   </Link>
                 </li>
               </ul>
             </div>
-            <div>
+            {/* <div>
               <h4 className="text-lg font-semibold mb-4">Legal</h4>
               <ul className="space-y-2">
                 <li>
@@ -115,7 +109,7 @@ export const Footer = () => {
                   </Link>
                 </li>
               </ul>
-            </div>
+            </div> */}
           </div>
         </div>
 

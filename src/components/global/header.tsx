@@ -43,9 +43,8 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className={`text-foreground hover:text-foreground/80 ${
-                pathname === item.href ? "font-medium" : ""
-              }`}
+              className={`text-foreground hover:text-foreground/80 ${pathname === item.href ? "font-medium" : ""
+                }`}
             >
               {item.label}
             </Link>
@@ -56,7 +55,7 @@ export function Header() {
             <div className="relative">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="h-8 flex items-center justify-center px-3 border border-input rounded-md hover:bg-accent/10"
+                className="p-2 px-5 flex items-center justify-center  border border-input rounded-md hover:bg-accent/10"
               >
                 {currentUser.split(" ")[0] || "U"}
               </button>
