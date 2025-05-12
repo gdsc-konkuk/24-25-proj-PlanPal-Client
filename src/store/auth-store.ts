@@ -18,8 +18,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   setAccessToken: (token) =>
     set({
       accessToken: token,
-      userEmail: parseJwt(token || "").email,
-      userName: parseJwt(token || "").name,
+      userEmail: parseJwt(token).email,
+      userName: parseJwt(token).name,
     }),
   setInitialized: (initialized) => set({ isInitialized: initialized }),
 }));
