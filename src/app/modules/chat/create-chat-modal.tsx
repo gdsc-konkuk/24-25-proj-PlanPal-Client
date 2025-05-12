@@ -27,11 +27,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { createChatRoom } from "@/app/modules/chat/api/chat-room";
 import { cn } from "@/lib/utils";
+import { PlaceAutocomplete } from "@/app/modules/chat/place-autocomplete";
 
 type Destination = {
   id: string;
-  country: string;
-  region: string;
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
 };
 
 interface CreateChatModalProps {
@@ -47,8 +50,7 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
   const [newTravelName, setNewTravelName] = useState("");
   const [newTravelParticipants, setNewTravelParticipants] = useState(1);
   const [destinations, setDestinations] = useState<Destination[]>([]);
-  const [newCountry, setNewCountry] = useState("");
-  const [newRegion, setNewRegion] = useState("");
+  const [selectedPlace, setSelectedPlace] = useState<Destination | null>(null);
   const [newTravelDate, setNewTravelDate] = useState<DateRange | undefined>();
   const [newTravelDescription, setNewTravelDescription] = useState("");
 
@@ -67,8 +69,7 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
     setNewTravelName("");
     setNewTravelParticipants(1);
     setDestinations([]);
-    setNewCountry("");
-    setNewRegion("");
+    setSelectedPlace(null);
     setNewTravelDate(undefined);
     setNewTravelDescription("");
     setInviteLink("");
@@ -90,15 +91,38 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
     try {
       setIsCreatingTravel(true);
 
+      // 대표 목적지 좌표 계산 (첫 번째 목적지 또는 여러 목적지의 중심점)
+      let coordinates = { lat: 0, lng: 0 };
+
+      if (destinations.length > 0) {
+        if (destinations.length === 1) {
+          // 목적지가 하나인 경우, 해당 좌표 사용
+          coordinates = {
+            lat: destinations[0].lat,
+            lng: destinations[0].lng
+          };
+        } else {
+          // 목적지가 여러 개인 경우, 중심점 계산
+          const totalLat = destinations.reduce((sum, dest) => sum + dest.lat, 0);
+          const totalLng = destinations.reduce((sum, dest) => sum + dest.lng, 0);
+          coordinates = {
+            lat: totalLat / destinations.length,
+            lng: totalLng / destinations.length
+          };
+        }
+      }
+
+      // 목적지 이름 문자열 생성
+      const destinationString = destinations.map(dest =>
+        `${dest.name} (${dest.address})`
+      ).join(", ");
+
       // Create request payload from form data
       const chatRoomData = {
         name: newTravelName,
         limitUsers: newTravelParticipants,
-        destination: destinations.map(dest =>
-          dest.country + (dest.region ? ` - ${dest.region}` : "")
-        ).join(", "),
-        // For coordinates, always provide a valid object as required by the API
-        coordinates: { lat: 0, lng: 0 }, // You should get actual coordinates in a real implementation
+        destination: destinationString,
+        coordinates: coordinates,
         thumbnailUrl: coverImageUrl,
       };
 
@@ -135,16 +159,24 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
     setTimeout(() => setLinkCopied(false), 2000);
   };
 
-  const addDestination = () => {
-    if (newCountry.trim()) {
-      const newDest: Destination = {
+  const handlePlaceSelect = (place: { name: string; address: string; lat: number; lng: number }) => {
+    if (place.name && place.lat && place.lng) {
+      setSelectedPlace({
         id: `dest-${Date.now()}`,
-        country: newCountry,
-        region: newRegion,
-      };
-      setDestinations([...destinations, newDest]);
-      setNewCountry("");
-      setNewRegion("");
+        name: place.name,
+        address: place.address,
+        lat: place.lat,
+        lng: place.lng
+      });
+    } else {
+      setSelectedPlace(null);
+    }
+  };
+
+  const addDestination = () => {
+    if (selectedPlace) {
+      setDestinations(prev => [...prev, selectedPlace]);
+      setSelectedPlace(null);
     }
   };
 
@@ -258,27 +290,21 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
 
           <TabsContent value="destination" className="space-y-4">
             <div className="space-y-2">
-              <Label>Add Destinations</Label>
-              <div className="flex space-x-2">
-                <Input
-                  placeholder="Country"
-                  value={newCountry}
-                  onChange={(e) => setNewCountry(e.target.value)}
-                  className="flex-1"
+              <Label>Search Destination</Label>
+              <div className="flex flex-col space-y-2">
+                <PlaceAutocomplete
+                  onPlaceSelect={handlePlaceSelect}
+                  placeholder="Search for countries, cities, or landmarks"
                 />
-                <Input
-                  placeholder="City/Region (Optional)"
-                  value={newRegion}
-                  onChange={(e) => setNewRegion(e.target.value)}
-                  className="flex-1"
-                />
+
                 <Button
                   type="button"
                   variant="outline"
                   onClick={addDestination}
-                  disabled={!newCountry.trim()}
+                  disabled={!selectedPlace}
+                  className="mt-2"
                 >
-                  Add
+                  Add to Destinations
                 </Button>
               </div>
             </div>
@@ -294,8 +320,10 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
                   <div className="flex flex-wrap gap-2">
                     {destinations.map((dest) => (
                       <Badge key={dest.id} variant="secondary" className="pl-2">
-                        {dest.country}
-                        {dest.region && ` - ${dest.region}`}
+                        {dest.name}
+                        <span className="text-xs text-muted-foreground ml-1">
+                          ({dest.lat.toFixed(2)}, {dest.lng.toFixed(2)})
+                        </span>
                         <button
                           className="ml-1 rounded-full hover:bg-muted-foreground/20"
                           onClick={() => removeDestination(dest.id)}
