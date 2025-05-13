@@ -48,7 +48,7 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
 
   // Form state
   const [newTravelName, setNewTravelName] = useState("");
-  const [newTravelParticipants, setNewTravelParticipants] = useState(1);
+  const [newTravelParticipants, setNewTravelParticipants] = useState(10);
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [selectedPlace, setSelectedPlace] = useState<Destination | null>(null);
   const [newTravelDate, setNewTravelDate] = useState<DateRange | undefined>();
@@ -224,7 +224,7 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
                 id="participants"
                 type="number"
                 min="1"
-                max="10"
+                max="100"
                 value={newTravelParticipants}
                 onChange={(e) => setNewTravelParticipants(parseInt(e.target.value))}
               />

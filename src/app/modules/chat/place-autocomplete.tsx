@@ -90,7 +90,7 @@ export function PlaceAutocomplete({
     if (!window.google || !window.google.maps || !window.google.maps.places || !inputRef.current) return;
 
     const options = {
-      types: ["(regions)"], // 국가, 도시, 지역 등만 검색되도록 제한
+      // types: ["(regions)"], // 국가, 도시, 지역 등만 검색되도록 제한
       fields: ["name", "formatted_address", "geometry", "place_id"],
     };
 
