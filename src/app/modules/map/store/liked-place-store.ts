@@ -12,6 +12,11 @@ export type LikedPlace = {
   lng: number;
   marker?: google.maps.marker.AdvancedMarkerElement;
   iconType: IconType;
+  rating: number;
+  address: string;
+  description: string;
+  type: string;
+  addedBy: string;
 };
 
 type LikedPlaceStore = {

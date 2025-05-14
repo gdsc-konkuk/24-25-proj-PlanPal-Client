@@ -40,6 +40,12 @@ export function MapOverlay({ position, placeInfo, onClose }: MapOverlayProps) {
         lat: position.lat(),
         lng: position.lng(),
         iconType: IconType.HEART,
+        rating: placeInfo.place.rating || 0,
+        address: placeInfo.place.formatted_address || "No address",
+        description:
+          placeInfo.place.formatted_phone_number || "No phone number",
+        type: placeInfo.place.types?.[0] || "Unknown",
+        addedBy: "user",
       });
 
       const img = document.createElement("img");
