@@ -58,9 +58,6 @@ export function PlaceCard({ place, activePlacesTab }: PlaceCardProps) {
     if (marker) marker.content = img;
   };
 
-  console.log("place", place);
-  console.log("place", place.name);
-
   return (
     <Card key={place.placeId} className="overflow-hidden py-2">
       <CardContent className="p-3">
@@ -81,7 +78,7 @@ export function PlaceCard({ place, activePlacesTab }: PlaceCardProps) {
 
               <div className="flex items-center text-xs text-muted-foreground">
                 <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
-                <span className="truncate">{place.address}</span>
+                <span className="truncate max-w-[150px]">{place.address}</span>
               </div>
 
               <div className="flex items-center justify-between mt-4">
@@ -104,13 +101,12 @@ export function PlaceCard({ place, activePlacesTab }: PlaceCardProps) {
                   <Clock className="h-3 w-3 mr-1" />
                   <span>Added by {place.addedBy}</span>
                 </div>
-                <Button
-                  size="sm"
-                  className="h-6 text-xs"
+                <div
+                  className="h-6 text-xs border rounded-md px-2 flex items-center justify-center cursor-pointer hover:bg-blue-500 hover:text-white transition-colors bg-black text-white"
                   onClick={() => toggleConfirmed(place)}
                 >
                   {activePlacesTab === "confirmed" ? "Remove" : "Confirm"}
-                </Button>
+                </div>
               </div>
             </div>
           </div>

@@ -66,7 +66,7 @@ import {
 import { useMapStore } from "@/app/modules/map/store/map-store";
 import { cn } from "@/lib/utils";
 import { useApi } from "@/hooks/use-api";
-import { PlaceCard } from "./place-card";
+import { PlaceDialog } from "./place-dialog";
 
 type MessageType = {
   id: string;
@@ -573,9 +573,9 @@ export default function Chat() {
           {filteredPlaces.length > 0 ? (
             <div className="space-y-3">
               {filteredPlaces.map((place) => (
-                <PlaceCard
-                  place={place}
+                <PlaceDialog
                   key={place.placeId}
+                  place={place}
                   activePlacesTab={activePlacesTab}
                 />
               ))}
