@@ -11,5 +11,5 @@ export async function logoutRequest() {
     throw new Error("Logout failed");
   }
 
-  return res.json();
+  // return res.json();
 }
