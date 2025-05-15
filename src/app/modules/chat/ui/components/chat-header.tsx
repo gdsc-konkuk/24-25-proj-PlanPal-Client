@@ -53,10 +53,10 @@ export function ChatHeader({
 
         if (!isNaN(chatRoomId)) {
           try {
-            const inviteCode = await api<string>(
-              `/chat-rooms/${chatRoomId}/invite}`
+            const response = await api<{ inviteCode: string }>(
+              `/chat-rooms/${chatRoomId}/invite`
             );
-            setInviteCode(inviteCode);
+            setInviteCode(response.inviteCode);
           } catch (error) {
             console.error("Failed to fetch invite code:", error);
             toast.error("Failed to load invite code");
