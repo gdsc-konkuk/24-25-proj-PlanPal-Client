@@ -4,6 +4,8 @@ availableSecrets:
       env: SECRET_SERVER_URL
     - versionName: projects/772190012442/secrets/GOOGLE_MAPS_API_KEY/versions/latest
       env: SECRET_GOOGLE_MAPS_API_KEY
+    - versionName: projects/772190012442/secrets/SOCKET_SERVER_URL/versions/latest
+      env: SECRET_SOCKET_SERVER_URL
 
 options:
   logging: CLOUD_LOGGING_ONLY
@@ -19,7 +21,13 @@ steps:
         echo "NEXT_PUBLIC_API_SERVER_URL=$$SECRET_SERVER_URL" >> .env.production
         echo "NEXT_PUBLIC_CALLBACK_URL=https://planpal-client-772190012442.asia-northeast3.run.app/oauth/google/callback" >> .env.production
         echo "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$$SECRET_GOOGLE_MAPS_API_KEY" >> .env.production
-    secretEnv: ["SECRET_SERVER_URL", "SECRET_GOOGLE_MAPS_API_KEY"]
+        echo "SOCKET_SERVER_URL=$$SECRET_SOCKET_SERVER_URL" >> .env.production
+    secretEnv:
+      [
+        "SECRET_SERVER_URL",
+        "SECRET_GOOGLE_MAPS_API_KEY",
+        "SECRET_SOCKET_SERVER_URL",
+      ]
 
   - name: "gcr.io/cloud-builders/docker"
     args:
