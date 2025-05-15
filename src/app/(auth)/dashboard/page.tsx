@@ -265,7 +265,7 @@ export default function DashboardPage() {
                         {room.name}
                       </h3>
                       <div className="flex items-center text-white/90 text-sm">
-                        <MapPin className="h-3 w-3 mr-1" />
+                        <MapPin className="h-3 w-3 mr-1 shrink-0" />
                         <span>{room.destination}</span>
                       </div>
                     </div>
@@ -273,7 +273,7 @@ export default function DashboardPage() {
                   <CardContent className="p-4">
                     <div className="flex justify-between items-center mb-3">
                       <div className="flex items-center">
-                        <Users className="h-4 w-4 text-foreground/70 mr-2" />
+                        <Users className="h-4 w-4 text-foreground/70 mr-2 shrink-0" />
                         <span className="text-sm text-foreground/70">
                           Max {room.limitUsers} people
                         </span>
