@@ -8,7 +8,7 @@ interface PlaceCardProps {
   activePlacesTab: "confirmed" | "candidates";
 }
 
-export function PlaceCard({ place, activePlacesTab }: PlaceCardProps) {
+export function PlaceCard({ place }: PlaceCardProps) {
   const getTypeIcon = (type?: string) => {
     switch (type) {
       case "식사":
@@ -68,10 +68,7 @@ export function PlaceCard({ place, activePlacesTab }: PlaceCardProps) {
                   <span>Added by {place.addedBy}</span>
                 </div>
 
-                <ConfirmDialog
-                  place={place}
-                  activePlacesTab={activePlacesTab}
-                />
+                <ConfirmDialog place={place} />
               </div>
             </div>
           </div>

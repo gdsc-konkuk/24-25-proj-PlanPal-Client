@@ -1,5 +1,4 @@
 import { LikedPlace } from "@/app/modules/map/store/liked-place-store";
-
 import {
   Dialog,
   DialogContent,
@@ -10,14 +9,13 @@ import {
 } from "@/components/ui/dialog";
 import { useLikedPlaces } from "@/app/modules/map/store/liked-place-store";
 import { IconType } from "@/app/modules/map/store/liked-place-store";
-import { Button } from "@/components/ui/button";
+import { ConfirmForm } from "./confirm-form";
 
 interface PlaceCardProps {
   place: LikedPlace;
-  activePlacesTab: "confirmed" | "candidates";
 }
 
-export function ConfirmDialog({ place, activePlacesTab }: PlaceCardProps) {
+export function ConfirmDialog({ place }: PlaceCardProps) {
   const setIconType = useLikedPlaces((state) => state.setIconType);
   const getIconType = useLikedPlaces((state) => state.getIconType);
   const getMarker = useLikedPlaces((state) => state.getMarker);
@@ -36,21 +34,29 @@ export function ConfirmDialog({ place, activePlacesTab }: PlaceCardProps) {
     if (marker) marker.content = img;
   };
 
+  if (getIconType(place.placeId) === IconType.STAR) {
+    return (
+      <div
+        className="h-[28px] rounded-xl bg-black text-white hover:bg-gray-500 text-center w-[80px] flex items-center justify-center hover:cursor-pointer"
+        onClick={() => toggleConfirmed(place)}
+      >
+        Remove
+      </div>
+    );
+  }
+
   return (
     <Dialog>
-      <DialogTrigger onClick={(e) => e.stopPropagation()}>
-        <Button className="h-[28px]">
-          {activePlacesTab === "confirmed" ? "Remove" : "Confirm"}
-        </Button>
+      <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
+        <div className="h-[28px] rounded-xl bg-black text-white hover:bg-gray-500 text-center w-[80px] flex items-center justify-center hover:cursor-pointer">
+          Confirm
+        </div>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{place.name}</DialogTitle>
           <DialogDescription asChild>
-            <div>
-              <div>Hi</div>
-              <Button onClick={() => toggleConfirmed(place)}>confirm</Button>
-            </div>
+            <ConfirmForm onToggleConfirmed={toggleConfirmed} place={place} />
           </DialogDescription>
         </DialogHeader>
       </DialogContent>
