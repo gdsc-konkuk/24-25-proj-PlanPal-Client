@@ -19,9 +19,9 @@ export default function AuthLayout({
   useEffect(() => {
     if (!isInitialized) return;
 
-    if (accessToken === null) {
-      router.replace(`/?from=${pathname}`);
+    if (!accessToken) {
       toast.error("You need to login first");
+      router.replace(`/?from=${pathname}`);
     }
   }, [accessToken]);
 
