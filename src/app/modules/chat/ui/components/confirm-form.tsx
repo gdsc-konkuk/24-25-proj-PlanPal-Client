@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/popover";
 import { toast } from "sonner";
 import { ConfirmFormSchema } from "../../lib/confirm-form-schema";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { LikedPlace } from "@/app/modules/map/store/liked-place-store";
 
@@ -116,7 +116,7 @@ interface DateTimePickerFieldProps {
     type: "hour" | "minute" | "ampm",
     value: string
   ) => void;
-  form: any;
+  form: UseFormReturn<z.infer<typeof ConfirmFormSchema>>;
 }
 
 function DateTimePickerField({
