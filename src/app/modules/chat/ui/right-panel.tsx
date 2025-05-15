@@ -48,9 +48,6 @@ export const RightPanel = ({
             <Badge variant="outline" className="text-xs">
               {participants.length} participants
             </Badge>
-            <Button variant="ghost" size="icon" className="h-7 w-7">
-              <Plus className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </div>

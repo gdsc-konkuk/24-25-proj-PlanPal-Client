@@ -11,8 +11,14 @@ import {
   MessageCircleIcon,
   EyeIcon,
   EyeOffIcon,
+  Clipboard,
+  LinkIcon,
 } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
+import { parseJwt } from "@/lib/parseJwt";
+import { toast } from "sonner";
+import { useState, useEffect } from "react";
+import { getChatRoomInviteCode } from "../../api/chat-room";
 
 interface ChatHeaderProps {
   travelId: string | null;
@@ -33,6 +39,32 @@ export function ChatHeader({
   onToggleMiddlePanel,
   onToggleRightPanel,
 }: ChatHeaderProps) {
+  // Add state for invite code
+  const [inviteCode, setInviteCode] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // Fetch invite code when travelId changes
+  useEffect(() => {
+    if (travelId) {
+      setIsLoading(true);
+      const chatRoomId = parseInt(travelId, 10);
+
+      if (!isNaN(chatRoomId)) {
+        getChatRoomInviteCode(chatRoomId)
+          .then(response => {
+            setInviteCode(response);
+          })
+          .catch(error => {
+            console.error("Failed to fetch invite code:", error);
+            toast.error("Failed to load invite code");
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
+      }
+    }
+  }, [travelId]);
+
   // 패널 가시성 상태 계산
   const visiblePanelCount = [
     leftPanelVisible,
@@ -41,8 +73,8 @@ export function ChatHeader({
   ].filter(Boolean).length;
 
   // 사용자 정보
-  const currentUser = useAuthStore((state) => state.userName);
-  const avatarText = currentUser ? currentUser.charAt(0) : "U";
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const currentUser = accessToken ? parseJwt(accessToken).name : "User";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-10 bg-background border-b border-primary/10 h-14 flex items-center px-4">
@@ -54,9 +86,42 @@ export function ChatHeader({
         </Button>
         <Logo size="sm" />
         {travelId && (
-          <span className="text-sm text-foreground/70 ml-2">
-            ID: {travelId}
-          </span>
+          <>
+            <span className="text-sm text-foreground/70 ml-2">
+              ID: {travelId}
+            </span>
+          </>
+        )}
+
+        {travelId && inviteCode && (
+          <div className="flex items-center ml-2">
+            <LinkIcon className="h-4 w-4 text-foreground/70 mr-2 shrink-0" />
+            <span className="text-sm font-medium">Invite Code:</span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="ml-2 flex items-center gap-1"
+              disabled={isLoading}
+              onClick={() => {
+                // Generate the invite link
+                const inviteLink = `${window.location.origin}/dashboard/invite?code=${inviteCode}`;
+
+                // Copy to clipboard
+                navigator.clipboard.writeText(inviteLink)
+                  .then(() => {
+                    // Show toast notification
+                    toast.success('Invitation link copied to clipboard!');
+                  })
+                  .catch(err => {
+                    console.error('Failed to copy: ', err);
+                    toast.error('Failed to copy link');
+                  });
+              }}
+            >
+              <span className="truncate max-w-[100px]">{isLoading ? "Loading..." : inviteCode}</span>
+              <Clipboard className="h-4 w-4" />
+            </Button>
+          </div>
         )}
       </div>
       <div className="ml-auto flex items-center gap-2">
@@ -103,12 +168,9 @@ export function ChatHeader({
             <EyeIcon className="h-3 w-3" />
           )}
         </Button>
-        <Avatar className="h-8 w-8">
-          <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-          <AvatarFallback className="bg-accent/30 text-accent-foreground">
-            {avatarText}
-          </AvatarFallback>
-        </Avatar>
+        <Button className="h-8 w-fit">
+          {currentUser}
+        </Button>
       </div>
     </header>
   );
