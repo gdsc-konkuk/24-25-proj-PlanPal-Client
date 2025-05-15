@@ -1,12 +1,22 @@
 import { create } from "zustand";
 
+export enum IconType {
+  HEART = "HEART",
+  STAR = "STAR",
+}
+
 export type LikedPlace = {
   placeId: string;
   name: string;
   lat: number;
   lng: number;
   marker?: google.maps.marker.AdvancedMarkerElement;
-  isConfirmed: boolean;
+  iconType: IconType;
+  rating: number;
+  address: string;
+  description: string;
+  type: string;
+  addedBy: string;
 };
 
 type LikedPlaceStore = {
@@ -21,8 +31,8 @@ type LikedPlaceStore = {
   getMarker: (
     placeId: string
   ) => google.maps.marker.AdvancedMarkerElement | undefined;
-  setIsConfirmed: (placeId: string, isConfirmed: boolean) => void;
-  getIsConfirmed: (placeId: string) => boolean;
+  setIconType: (placeId: string, iconType: IconType) => void;
+  getIconType: (placeId: string) => IconType | undefined;
 };
 
 export const useLikedPlaces = create<LikedPlaceStore>((set, get) => ({
@@ -44,12 +54,12 @@ export const useLikedPlaces = create<LikedPlaceStore>((set, get) => ({
     })),
   getMarker: (placeId) =>
     get().likedPlaces.find((p) => p.placeId === placeId)?.marker,
-  setIsConfirmed: (placeId, isConfirmed) =>
+  setIconType: (placeId, iconType) =>
     set((state) => ({
       likedPlaces: state.likedPlaces.map((p) =>
-        p.placeId === placeId ? { ...p, isConfirmed } : p
+        p.placeId === placeId ? { ...p, iconType } : p
       ),
     })),
-  getIsConfirmed: (placeId) =>
-    get().likedPlaces.find((p) => p.placeId === placeId)?.isConfirmed || false,
+  getIconType: (placeId) =>
+    get().likedPlaces.find((p) => p.placeId === placeId)?.iconType,
 }));

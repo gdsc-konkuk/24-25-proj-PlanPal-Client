@@ -40,7 +40,7 @@ import {
   EyeOffIcon,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
-import { GoogleMap } from "@/components/google-map";
+import { GoogleMap } from "@/app/modules/map/ui/components/google-map";
 import { format } from "date-fns";
 import Link from "next/link";
 import {
@@ -58,8 +58,15 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { WeeklyScheduleView } from "@/components/weekly-schedule-view";
 import { ResizableLayout } from "@/components/resizable-layout";
-import { LikedPlace, useLikedPlaces } from "@/store/liked-place-store";
-import { useMapStore } from "@/store/map-store";
+import {
+  IconType,
+  LikedPlace,
+  useLikedPlaces,
+} from "@/app/modules/map/store/liked-place-store";
+import { useMapStore } from "@/app/modules/map/store/map-store";
+import { cn } from "@/lib/utils";
+import { useApi } from "@/hooks/use-api";
+import { PlaceDialog } from "./place-dialog";
 
 type MessageType = {
   id: string;
@@ -155,9 +162,11 @@ export default function Chat() {
 
   const map = useMapStore((state) => state.map);
   const likedPlaces = useLikedPlaces((state) => state.likedPlaces);
-  const setIsConfirmed = useLikedPlaces((state) => state.setIsConfirmed);
-  const getIsConfirmed = useLikedPlaces((state) => state.getIsConfirmed);
+  const setIconType = useLikedPlaces((state) => state.setIconType);
+  const getIconType = useLikedPlaces((state) => state.getIconType);
   const getMarker = useLikedPlaces((state) => state.getMarker);
+
+  const api = useApi();
 
   // 패널 가시성 변경 핸들러 - 이 함수는 ResizableLayout에서만 호출되도록 수정
   const handlePanelVisibilityChange = (
@@ -361,25 +370,13 @@ export default function Chat() {
     );
   };
 
-  const toggleConfirmed = (place: LikedPlace) => {
-    const placeId = place.placeId;
-    const isConfirmed = getIsConfirmed(placeId);
-    setIsConfirmed(placeId, !isConfirmed);
-    const marker = getMarker(placeId);
-
-    const img = document.createElement("img");
-    img.src = !isConfirmed ? "/star.png" : "/heart.png";
-    img.style.width = "36px";
-    img.style.height = "36px";
-
-    if (marker) marker.content = img;
-  };
-
   // Filter places based on selected filters
   const filteredPlaces = likedPlaces.filter((place) => {
     // First filter by confirmed/candidates tab
     const matchesTab =
-      activePlacesTab === "confirmed" ? place.isConfirmed : !place.isConfirmed;
+      activePlacesTab === "confirmed"
+        ? place.iconType === IconType.STAR
+        : place.iconType === IconType.HEART;
 
     // // Then apply additional filters
     // const matchesType = placeFilter === "all" || place.type === placeFilter;
@@ -414,22 +411,6 @@ export default function Chat() {
     return matchesTab;
   });
 
-  // Get the type icon for a place
-  const getTypeIcon = (type?: string) => {
-    switch (type) {
-      case "식사":
-        return <Utensils className="h-4 w-4" />;
-      case "관광":
-        return <Camera className="h-4 w-4" />;
-      case "숙박":
-        return <Bed className="h-4 w-4" />;
-      case "이동":
-        return <Bus className="h-4 w-4" />;
-      default:
-        return <MapPin className="h-4 w-4" />;
-    }
-  };
-
   // 새 일정 추가
   const handleAddEvent = (eventData: Omit<ScheduleItem, "id" | "color">) => {
     const newEvent: ScheduleItem = {
@@ -452,41 +433,51 @@ export default function Chat() {
 
   // 왼쪽 패널 컨텐츠
   const leftPanelContent = (
-    <div className="h-full flex flex-col border-r border-primary/10">
-      <Tabs
-        defaultValue="map"
-        value={activeLeftTab}
-        onValueChange={setActiveLeftTab}
-        className="h-full flex flex-col"
-      >
-        <div className="border-b border-primary/10 px-4 py-2">
-          <TabsList className="w-full">
-            <TabsTrigger value="map" className="flex-1">
-              <Map className="h-4 w-4 mr-2" />
-              Map
-            </TabsTrigger>
-            <TabsTrigger value="calendar" className="flex-1">
-              <CalendarIcon className="h-4 w-4 mr-2" />
-              Calendar
-            </TabsTrigger>
-          </TabsList>
+    <Tabs
+      defaultValue="map"
+      value={activeLeftTab}
+      onValueChange={setActiveLeftTab}
+      className="h-full flex flex-col"
+    >
+      <div className="border-b border-primary/10 px-4 py-2">
+        <TabsList className="w-full">
+          <TabsTrigger value="map" className="flex-1">
+            <Map className="h-4 w-4 mr-2" />
+            Map
+          </TabsTrigger>
+          <TabsTrigger value="calendar" className="flex-1">
+            <CalendarIcon className="h-4 w-4 mr-2" />
+            Calendar
+          </TabsTrigger>
+        </TabsList>
+      </div>
+
+      <div className="flex-1 relative">
+        <div
+          className={cn("absolute inset-0 transition-opacity", {
+            "opacity-100 visible pointer-events-auto": activeLeftTab === "map",
+            "opacity-0 invisible pointer-events-none": activeLeftTab !== "map",
+          })}
+        >
+          <GoogleMap />
         </div>
 
-        <TabsContent value="map" className="flex-1 p-4 overflow-hidden">
-          <div className="h-full rounded-lg overflow-hidden">
-            <GoogleMap />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="calendar" className="flex-1 overflow-hidden">
+        <div
+          className={cn("absolute inset-0 transition-opacity", {
+            "opacity-100 visible pointer-events-auto":
+              activeLeftTab === "calendar",
+            "opacity-0 invisible pointer-events-none":
+              activeLeftTab !== "calendar",
+          })}
+        >
           <WeeklyScheduleView
             scheduleItems={scheduleItems}
             places={likedPlaces}
             onAddEvent={handleAddEvent}
           />
-        </TabsContent>
-      </Tabs>
-    </div>
+        </div>
+      </div>
+    </Tabs>
   );
 
   // 중앙 패널 컨텐츠
@@ -582,97 +573,11 @@ export default function Chat() {
           {filteredPlaces.length > 0 ? (
             <div className="space-y-3">
               {filteredPlaces.map((place) => (
-                <Card key={place.placeId} className="overflow-hidden">
-                  <CardContent className="p-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1 mb-1">
-                          <h3 className="font-medium text-sm truncate">
-                            {place.name}
-                          </h3>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-5 w-5 ml-1"
-                            onClick={() => toggleFavorite(place.id)}
-                          >
-                            {place.isFavorite ? (
-                              <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-                            ) : (
-                              <Star className="h-3.5 w-3.5" />
-                            )}
-                          </Button>
-                        </div>
-
-                        <div className="flex items-center text-xs text-muted-foreground mb-2">
-                          <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
-                          <span className="truncate">{place.address}</span>
-                        </div>
-
-                        {place.description && (
-                          <p className="text-xs text-foreground/80 mb-2 line-clamp-2">
-                            {place.description}
-                          </p>
-                        )}
-
-                        <div className="flex flex-wrap gap-1 mb-1">
-                          {place.category && (
-                            <Badge
-                              variant="outline"
-                              className="text-xs px-1 py-0 h-5"
-                            >
-                              {place.category}
-                            </Badge>
-                          )}
-                          {place.rating && (
-                            <Badge
-                              variant="outline"
-                              className="text-xs px-1 py-0 h-5 bg-yellow-50"
-                            >
-                              ★ {place.rating}
-                            </Badge>
-                          )}
-                          {place.type && (
-                            <Badge className="text-xs px-1 py-0 h-5 bg-primary/20 text-primary">
-                              {getTypeIcon(place.type)}
-                              <span className="ml-1">{place.type}</span>
-                            </Badge>
-                          )}
-                        </div>
-
-                        {place.visitTime && (
-                          <div className="flex items-center text-xs text-muted-foreground mt-2">
-                            <Clock className="h-3 w-3 mr-1" />
-                            <span>
-                              {format(place.visitTime, "MMM d, HH:mm")}
-                              {place.duration &&
-                                ` (${Math.floor(place.duration / 60)}h ${
-                                  place.duration % 60
-                                }m)`}
-                            </span>
-                          </div>
-                        )}
-
-                        <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-                          <div className="flex items-center">
-                            <Clock className="h-3 w-3 mr-1" />
-                            <span>Added by {place.addedBy}</span>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 text-xs"
-                            onClick={() => toggleConfirmed(place)}
-                          >
-                            {activePlacesTab === "confirmed"
-                              ? "Remove"
-                              : "Confirm"}
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <PlaceDialog
+                  key={place.placeId}
+                  place={place}
+                  activePlacesTab={activePlacesTab}
+                />
               ))}
             </div>
           ) : (

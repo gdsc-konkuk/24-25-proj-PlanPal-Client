@@ -2,10 +2,13 @@
 
 import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import { createCustomOverlay } from "@/lib/create-custom-overlay";
+import { createCustomOverlay } from "@/app/modules/map/lib/create-custom-overlay";
 import { HeartIcon, HomeIcon, PhoneIcon, StarIcon, XIcon } from "lucide-react";
-import { useLikedPlaces } from "@/store/liked-place-store";
-import { useMapStore } from "@/store/map-store";
+import {
+  IconType,
+  useLikedPlaces,
+} from "@/app/modules/map/store/liked-place-store";
+import { useMapStore } from "@/app/modules/map/store/map-store";
 
 type MapOverlayProps = {
   position: google.maps.LatLng;
@@ -36,7 +39,13 @@ export function MapOverlay({ position, placeInfo, onClose }: MapOverlayProps) {
         name: placeInfo.place.name || "Unknown",
         lat: position.lat(),
         lng: position.lng(),
-        isConfirmed: false,
+        iconType: IconType.HEART,
+        rating: placeInfo.place.rating || 0,
+        address: placeInfo.place.formatted_address || "No address",
+        description:
+          placeInfo.place.formatted_phone_number || "No phone number",
+        type: placeInfo.place.types?.[0] || "Unknown",
+        addedBy: "user",
       });
 
       const img = document.createElement("img");

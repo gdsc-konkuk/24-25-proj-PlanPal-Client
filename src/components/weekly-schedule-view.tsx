@@ -19,7 +19,7 @@ import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { AddEventForm } from "./add-event-form";
-import { LikedPlace } from "@/store/liked-place-store";
+import { LikedPlace } from "@/app/modules/map/store/liked-place-store";
 
 type ScheduleItem = {
   id: string;

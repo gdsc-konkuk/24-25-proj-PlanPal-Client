@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { MapOverlay } from "./map-overlay";
-import { useMapStore } from "@/store/map-store";
+import { useMapStore } from "@/app/modules/map/store/map-store";
+import { useApi } from "@/hooks/use-api";
 
 export function GoogleMap() {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -16,9 +17,18 @@ export function GoogleMap() {
   const setMap = useMapStore((state) => state.setMap);
   const googleMaps = useMapStore((state) => state.googleMaps);
   const setGoogleMaps = useMapStore((state) => state.setGoogleMaps);
+  const api = useApi();
 
   useEffect(() => {
     const initMap = async () => {
+      // let mapConfig;
+      // try {
+      //   mapConfig = await api("/maps/chat-rooms/2");
+      // } catch (err) {
+      //   console.error("Failed to load map config:", err);
+      //   return;
+      // }
+
       const loader = new Loader({
         apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
         version: "weekly",
@@ -29,6 +39,9 @@ export function GoogleMap() {
       const markerLib = (await loader.importLibrary(
         "marker"
       )) as google.maps.MarkerLibrary;
+      const placeLib = (await loader.importLibrary(
+        "places"
+      )) as google.maps.PlacesLibrary;
 
       setGoogleMaps(maps);
 

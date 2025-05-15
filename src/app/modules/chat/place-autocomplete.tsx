@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MapPin, X } from "lucide-react";
-import { useMapStore } from "@/store/map-store";
+import { useMapStore } from "../map/store/map-store";
 
 interface PlaceAutocompleteProps {
   onPlaceSelect: (place: {
@@ -41,7 +41,7 @@ export function PlaceAutocomplete({
   useEffect(() => {
     // Google Maps API가 로드되었는지 확인
     if (!window.google || !window.google.maps) {
-      const script = document.createElement('script');
+      const script = document.createElement("script");
       script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
       script.async = true;
       script.defer = true;
@@ -59,16 +59,16 @@ export function PlaceAutocomplete({
     function initAutocompleteMap() {
       // 맵을 넣을 숨겨진 div 생성
       if (!autocompleteMapDivRef.current) {
-        const mapDiv = document.createElement('div');
-        mapDiv.style.display = 'none'; // 보이지 않게 설정
-        mapDiv.style.height = '0';
-        mapDiv.style.width = '0';
+        const mapDiv = document.createElement("div");
+        mapDiv.style.display = "none"; // 보이지 않게 설정
+        mapDiv.style.height = "0";
+        mapDiv.style.width = "0";
         document.body.appendChild(mapDiv);
         autocompleteMapDivRef.current = mapDiv;
 
         // 맵 인스턴스 생성
         autocompleteMapRef.current = new google.maps.Map(mapDiv, {
-          center: { lat: 37.5665, lng: 126.9780 }, // 서울 중심 좌표
+          center: { lat: 37.5665, lng: 126.978 }, // 서울 중심 좌표
           zoom: 8,
           disableDefaultUI: true,
         });
@@ -87,7 +87,13 @@ export function PlaceAutocomplete({
 
   // 자동완성 설정
   useEffect(() => {
-    if (!window.google || !window.google.maps || !window.google.maps.places || !inputRef.current) return;
+    if (
+      !window.google ||
+      !window.google.maps ||
+      !window.google.maps.places ||
+      !inputRef.current
+    )
+      return;
 
     const options = {
       // types: ["(regions)"], // 국가, 도시, 지역 등만 검색되도록 제한
@@ -95,7 +101,12 @@ export function PlaceAutocomplete({
     };
 
     // API가 존재하는지 다시 한번 확인
-    if (google && google.maps && google.maps.places && google.maps.places.Autocomplete) {
+    if (
+      google &&
+      google.maps &&
+      google.maps.places &&
+      google.maps.places.Autocomplete
+    ) {
       autocompleteRef.current = new google.maps.places.Autocomplete(
         inputRef.current,
         options
