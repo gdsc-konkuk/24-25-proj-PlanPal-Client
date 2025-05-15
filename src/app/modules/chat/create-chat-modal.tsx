@@ -146,7 +146,7 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
 
       // Generate an invite link using the inviteCode from the response
       const baseUrl = window.location.origin;
-      const inviteUrl = `${baseUrl}/invite/${response.inviteCode}`;
+      const inviteUrl = `${baseUrl}/dashboard/invite?code=${response.inviteCode}`;
       setInviteLink(inviteUrl);
 
       // Store the new travel ID for later navigation
@@ -267,13 +267,13 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
               />
             </div>
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label htmlFor="date-range">Travel Date</Label>
               <DatePickerWithRange
                 date={newTravelDate}
                 setDate={setNewTravelDate}
               />
-            </div>
+            </div> */}
 
             <div className="space-y-2">
               <Label htmlFor="description">Trip Description (Optional)</Label>
@@ -366,6 +366,7 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
                       accept="image/*"
                       onChange={handleFileChange}
                       className="mb-2"
+                      alt="Upload an image"
                     />
                     <p className="text-xs text-muted-foreground">
                       Select an image file from your device
