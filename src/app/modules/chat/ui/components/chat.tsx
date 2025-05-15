@@ -21,9 +21,9 @@ import { useMapStore } from "@/app/modules/map/store/map-store";
 import { useApi } from "@/hooks/use-api";
 import Link from "next/link";
 import { MessageType, ParticipantType, ScheduleItem } from "../../types";
-import { LeftPanel } from "./LeftPanel";
-import { MiddlePanel } from "./MiddlePanel";
-import { RightPanel } from "./RightPanel";
+import { LeftPanel } from "./left-panel";
+import { MiddlePanel } from "./middle-panel";
+import { RightPanel } from "./right-panel";
 
 export default function Chat() {
   const router = useRouter();

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MessageType, ParticipantType } from "../../types";
-import { ChatMessage } from "./ChatMessage";
+import { ChatMessage } from "./chat-message";
 
 interface RightPanelProps {
   messages: MessageType[];
