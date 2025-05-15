@@ -20,7 +20,7 @@ interface ChatRoomCreateRequest {
   thumbnailUrl?: string;
 }
 
-interface ChatRoomResponse {
+export interface ChatRoomResponse {
   id: number;
   name: string;
   inviteCode: string;

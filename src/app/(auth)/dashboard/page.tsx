@@ -13,12 +13,20 @@ import {
   Users,
   MessageSquare,
   Loader2,
+  Clock,
+  Link,
 } from "lucide-react";
 import { format } from "date-fns";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { CreateChatModal } from "@/app/modules/chat/create-chat-modal";
-import { getChatRooms, ChatRoom } from "@/app/modules/chat/api/chat-room";
+import {
+  getChatRooms,
+  getChatRoom,
+  ChatRoom,
+  ChatRoomResponse
+} from "@/app/modules/chat/api/chat-room";
+import { formatChatRoomDate } from "@/app/modules/chat/utils/format-date";
 
 // 여행 방 타입 정의
 type TravelRoom = {
@@ -52,6 +60,7 @@ export default function DashboardPage() {
 
   // API chat rooms state
   const [apiChatRooms, setApiChatRooms] = useState<ChatRoom[]>([]);
+  const [chatRoomDetails, setChatRoomDetails] = useState<Record<number, ChatRoomResponse>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -62,6 +71,19 @@ export default function DashboardPage() {
         setIsLoading(true);
         const data = await getChatRooms();
         setApiChatRooms(data);
+
+        // Fetch detailed information for each chat room
+        const detailsPromises = data.map(room => getChatRoom(room.id));
+        const detailsResults = await Promise.allSettled(detailsPromises);
+
+        const details: Record<number, ChatRoomResponse> = {};
+        detailsResults.forEach((result, index) => {
+          if (result.status === 'fulfilled') {
+            details[data[index].id] = result.value;
+          }
+        });
+
+        setChatRoomDetails(details);
       } catch (err) {
         console.error("Failed to fetch chat rooms:", err);
         setError("Failed to load chat rooms");
@@ -247,49 +269,72 @@ export default function DashboardPage() {
           <>
             <h2 className="text-xl font-medium mb-4">Your Trip Plans</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {apiChatRooms.map((room) => (
-                <Card
-                  key={room.id}
-                  className="overflow-hidden hover:shadow-lg transition-shadow"
-                >
-                  <div className="relative h-48">
-                    <Image
-                      src={room.thumbnailUrl || "/placeholder.svg"}
-                      alt={room.name}
-                      fill
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <h3 className="text-white font-bold text-xl mb-1">
-                        {room.name}
-                      </h3>
-                      <div className="flex items-center text-white/90 text-sm">
-                        <MapPin className="h-3 w-3 mr-1 shrink-0" />
-                        <span>{room.destination}</span>
+              {apiChatRooms.map((room) => {
+                const details = chatRoomDetails[room.id];
+
+                return (
+                  <Card
+                    key={room.id}
+                    className="overflow-hidden hover:shadow-lg transition-shadow"
+                  >
+                    <div className="relative h-48">
+                      <Image
+                        src={room.thumbnailUrl || "/placeholder.svg"}
+                        alt={room.name}
+                        fill
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-4">
+                        <h3 className="text-white font-bold text-xl mb-1">
+                          {room.name}
+                        </h3>
+                        <div className="flex items-center text-white/90 text-sm">
+                          <MapPin className="h-3 w-3 mr-1 shrink-0" />
+                          <span>{room.destination}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-center mb-3">
-                      <div className="flex items-center">
-                        <Users className="h-4 w-4 text-foreground/70 mr-2 shrink-0" />
-                        <span className="text-sm text-foreground/70">
-                          Max {room.limitUsers} people
-                        </span>
+                    <CardContent className="px-4">
+                      <div className="flex justify-between items-center mb-3">
+                        <div className="flex items-center">
+                          <Users className="h-4 w-4 text-foreground/70 mr-2 shrink-0" />
+                          <span className="text-sm text-foreground/70">
+                            Max {room.limitUsers} people
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="p-4 pt-0">
-                    <Button
-                      className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
-                      onClick={() => router.push(`/chat?id=${room.id}`)}
-                    >
-                      Enter the chat
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
+
+                      {details && (
+                        <>
+                          <div className="flex items-center mb-3">
+                            <Link className="h-4 w-4 text-foreground/70 mr-2 shrink-0" />
+                            <span className="text-sm font-medium">Invite Code:</span>
+                            <Badge variant="outline" className="ml-2">
+                              {details.inviteCode}
+                            </Badge>
+                          </div>
+
+                          <div className="flex items-center mb-3">
+                            <Clock className="h-4 w-4 text-foreground/70 mr-2 shrink-0" />
+                            <span className="text-sm text-foreground/70">
+                              Created: {formatChatRoomDate(details.createdAt)}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                    </CardContent>
+                    <CardFooter className="p-4 pt-0">
+                      <Button
+                        className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+                        onClick={() => router.push(`/chat?id=${room.id}`)}
+                      >
+                        Enter the chat
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
             </div>
           </>
         )
