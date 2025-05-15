@@ -48,7 +48,7 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
 
   // Form state
   const [newTravelName, setNewTravelName] = useState("");
-  const [newTravelParticipants, setNewTravelParticipants] = useState(10);
+  const [newTravelParticipants, setNewTravelParticipants] = useState(1);
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [selectedPlace, setSelectedPlace] = useState<Destination | null>(null);
   const [newTravelDate, setNewTravelDate] = useState<DateRange | undefined>();
@@ -57,7 +57,7 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
   // UI state
   const [activeTab, setActiveTab] = useState("basic");
   const [coverImageType, setCoverImageType] = useState<"ai" | "upload">("ai");
-  const [coverImageUrl, setCoverImageUrl] = useState("/placeholder.svg?height=200&width=400");
+  const [coverImageUrl, setCoverImageUrl] = useState("");
 
   // Action state
   const [isCreatingTravel, setIsCreatingTravel] = useState(false);
@@ -67,7 +67,7 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
 
   const resetForm = () => {
     setNewTravelName("");
-    setNewTravelParticipants(1);
+    setNewTravelParticipants(10);
     setDestinations([]);
     setSelectedPlace(null);
     setNewTravelDate(undefined);
@@ -76,7 +76,7 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
     setLinkCopied(false);
     setActiveTab("basic");
     setCoverImageType("ai");
-    setCoverImageUrl("/placeholder.svg?height=200&width=400");
+    setCoverImageUrl("https://images.unsplash.com/photo-1504107435030-c7cd582601b8?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
     setNewTravelId(null);
   };
 
