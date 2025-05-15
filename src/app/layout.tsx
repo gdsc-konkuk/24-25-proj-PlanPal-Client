@@ -5,8 +5,6 @@ import { AuthInitializer } from "@/components/auth-initializer";
 import { Toaster } from "@/components/ui/sonner";
 import { Header } from "@/components/global/header";
 import { Footer } from "@/components/global/footer";
-import { usePathname } from "next/navigation";
-import Head from "next/head";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +34,8 @@ export const metadata: Metadata = {
     "AI Chat",
     "Map",
   ],
-  description: "PlanPal is a group planning tool that helps you map, chat, and go. It allows you to create a map with your friends, chat with them, and plan your trip together.",
+  description:
+    "PlanPal is a group planning tool that helps you map, chat, and go. It allows you to create a map with your friends, chat with them, and plan your trip together.",
   authors: [
     {
       name: "GDG on Campus Konkuk",
