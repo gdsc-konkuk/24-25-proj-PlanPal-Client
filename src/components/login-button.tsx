@@ -62,7 +62,7 @@ export function LoginButton({ setShowLoginModal }: LoginButtonProps) {
       className="md:inline-flex"
       onClick={accessToken ? handleLogout : handleLogin}
     >
-      {accessToken ? parseJwt(accessToken).name : "Log in"}
+      {accessToken ? currentUser : "Log in"}
     </Button>
   );
 }
