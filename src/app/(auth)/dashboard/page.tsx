@@ -15,6 +15,7 @@ import {
   Loader2,
   Clock,
   Link,
+  Clipboard,
 } from "lucide-react";
 import { format } from "date-fns";
 import Image from "next/image";
@@ -27,6 +28,7 @@ import {
   ChatRoomResponse
 } from "@/app/modules/chat/api/chat-room";
 import { formatChatRoomDate } from "@/app/modules/chat/utils/format-date";
+import { toast } from "sonner";
 
 // 여행 방 타입 정의
 type TravelRoom = {
@@ -310,9 +312,28 @@ export default function DashboardPage() {
                           <div className="flex items-center mb-3">
                             <Link className="h-4 w-4 text-foreground/70 mr-2 shrink-0" />
                             <span className="text-sm font-medium">Invite Code:</span>
-                            <Badge variant="outline" className="ml-2">
-                              {details.inviteCode}
-                            </Badge>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="ml-2 flex items-center gap-1"
+                              onClick={() => {
+                                // Generate the invite link
+                                const inviteLink = `${window.location.origin}/dashboard/invite?code=${details.inviteCode}`;
+
+                                // Copy to clipboard
+                                navigator.clipboard.writeText(inviteLink)
+                                  .then(() => {
+                                    // Show toast notification
+                                    toast.success('Invitation link copied to clipboard!');
+                                  })
+                                  .catch(err => {
+                                    console.error('Failed to copy: ', err);
+                                  });
+                              }}
+                            >
+                              <span className="truncate max-w-[100px]">{details.inviteCode}</span>
+                              <Clipboard className="h-4 w-4" />
+                            </Button>
                           </div>
 
                           <div className="flex items-center mb-3">
