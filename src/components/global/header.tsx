@@ -7,9 +7,6 @@ import { Logo } from "@/components/logo";
 
 import { LoginButton } from "@/components/login-button";
 import { LoginModal } from "@/app/modules/landing/ui/components/login-modal";
-import { useAuthStore } from "@/store/auth-store";
-import { useRouter } from "next/navigation";
-import { logoutRequest } from "@/app/modules/auth/api/logout";
 
 type NavItem = {
   href: string;
@@ -25,8 +22,6 @@ const DEFAULT_NAV_ITEMS: NavItem[] = [
 export function Header() {
   const pathname = usePathname();
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const router = useRouter();
 
   if (pathname === "/chat") {
     return null; // Hide header on the chat page
