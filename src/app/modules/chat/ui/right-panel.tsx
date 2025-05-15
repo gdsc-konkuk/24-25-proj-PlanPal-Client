@@ -5,8 +5,8 @@ import { MessageSquare, Send, Plus, Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MessageType, ParticipantType } from "../../types";
-import { ChatMessage } from "./chat-message";
+import { MessageType, ParticipantType } from "../types";
+import { ChatMessage } from "./components/chat-message";
 
 interface RightPanelProps {
   messages: MessageType[];

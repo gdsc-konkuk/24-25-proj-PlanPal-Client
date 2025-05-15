@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { LikedPlace, IconType } from "@/app/modules/map/store/liked-place-store";
-import { PlaceDialog } from "./place-dialog";
+import { PlaceDialog } from "./components/place-dialog";
 
 interface MiddlePanelProps {
   likedPlaces: LikedPlace[];
