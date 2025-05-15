@@ -1,5 +1,14 @@
 import { fetchAuth } from "@/lib/fetch-auth";
 
+// API response type for chat rooms list
+export interface ChatRoom {
+  id: number;
+  name: string;
+  limitUsers: number;
+  destination: string;
+  thumbnailUrl: string;
+}
+
 interface ChatRoomCreateRequest {
   name: string;
   limitUsers: number;
@@ -21,7 +30,7 @@ interface ChatRoomResponse {
   createdAt: string;
 }
 
-export async function getChatRooms() {
+export async function getChatRooms(): Promise<ChatRoom[]> {
   const response = await fetchAuth(
     `${process.env.NEXT_PUBLIC_API_SERVER_URL}/chat-rooms`
   );
