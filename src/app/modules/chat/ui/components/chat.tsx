@@ -2,37 +2,12 @@
 
 "use client";
 
-import type React from "react";
-
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
-  Send,
-  Plus,
-  CalendarIcon,
-  Map,
-  Bot,
-  Star,
-  StarOff,
-  MessageSquare,
-  Hash,
-  Search,
-  Info,
-  MapPin,
-  Clock,
   ArrowLeft,
-  Filter,
-  CalendarPlus2Icon as CalendarIcon2,
-  Utensils,
-  Bed,
-  Camera,
-  Bus,
   MapIcon,
   ListIcon,
   MessageCircleIcon,
@@ -40,85 +15,15 @@ import {
   EyeOffIcon,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
-import { GoogleMap } from "@/app/modules/map/ui/components/google-map";
-import { format } from "date-fns";
-import Link from "next/link";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { WeeklyScheduleView } from "@/components/weekly-schedule-view";
 import { ResizableLayout } from "@/components/resizable-layout";
-import {
-  IconType,
-  LikedPlace,
-  useLikedPlaces,
-} from "@/app/modules/map/store/liked-place-store";
+import { IconType, useLikedPlaces } from "@/app/modules/map/store/liked-place-store";
 import { useMapStore } from "@/app/modules/map/store/map-store";
-import { cn } from "@/lib/utils";
 import { useApi } from "@/hooks/use-api";
-import { PlaceDialog } from "./place-dialog";
-
-type MessageType = {
-  id: string;
-  sender: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
-  content: string;
-  timestamp: Date;
-  isAI: boolean;
-  containsPlace?: boolean;
-  placeInfo?: PlaceInfo;
-};
-
-type ParticipantType = {
-  id: string;
-  name: string;
-  avatar?: string;
-  isAI: boolean;
-  isOnline: boolean;
-};
-
-type PlaceInfo = {
-  id: string;
-  name: string;
-  lat: number;
-  lng: number;
-  address?: string;
-  description?: string;
-  category?: string;
-  rating?: number;
-  isFavorite: boolean;
-  isConfirmed: boolean;
-  addedBy?: string;
-  addedAt?: Date;
-  visitTime?: Date;
-  duration?: number; // 방문 예상 시간(분)
-  type?: "식사" | "관광" | "숙박" | "이동" | "기타";
-};
-
-type ScheduleItem = {
-  id: string;
-  placeId: string;
-  title: string;
-  date: Date;
-  startTime: Date;
-  endTime: Date;
-  type: "식사" | "관광" | "숙박" | "이동" | "기타";
-  description?: string;
-  color?: string;
-};
+import Link from "next/link";
+import { MessageType, ParticipantType, ScheduleItem } from "../../types";
+import { LeftPanel } from "./LeftPanel";
+import { MiddlePanel } from "./MiddlePanel";
+import { RightPanel } from "./RightPanel";
 
 export default function Chat() {
   const router = useRouter();
@@ -154,11 +59,7 @@ export default function Chat() {
 
   const [activeLeftTab, setActiveLeftTab] = useState("map");
   const [activePlacesTab, setActivePlacesTab] = useState("confirmed");
-  const [placeFilter, setPlaceFilter] = useState<string>("all");
-  const [timeFilter, setTimeFilter] = useState<string>("all");
-  const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>([]);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const map = useMapStore((state) => state.map);
   const likedPlaces = useLikedPlaces((state) => state.likedPlaces);
@@ -223,11 +124,6 @@ export default function Chat() {
 
     setRightPanelVisible(!rightPanelVisible);
   };
-
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
@@ -310,19 +206,6 @@ export default function Chat() {
       };
 
       setMessages((prev) => [...prev, aiMessage]);
-
-      // If AI recommended a place, add it to places list
-      if (placeInfo) {
-        setPlaces((prev) => {
-          if (!prev.some((p) => p.id === placeInfo.id)) {
-            return [
-              ...prev,
-              { ...placeInfo, addedBy: "AI Assistant", addedAt: new Date() },
-            ];
-          }
-          return prev;
-        });
-      }
     }, 1000);
   };
 
@@ -360,56 +243,15 @@ export default function Chat() {
     }
   };
 
-  const toggleFavorite = (placeId: string) => {
-    setPlaces(
-      places.map((place) =>
-        place.id === placeId
-          ? { ...place, isFavorite: !place.isFavorite }
-          : place
-      )
-    );
+  const toggleConfirmed = (placeId: string) => {
+    // 장소의 확정 여부 토글 로직
+    console.log("Toggle confirmed for:", placeId);
   };
 
-  // Filter places based on selected filters
-  const filteredPlaces = likedPlaces.filter((place) => {
-    // First filter by confirmed/candidates tab
-    const matchesTab =
-      activePlacesTab === "confirmed"
-        ? place.iconType === IconType.STAR
-        : place.iconType === IconType.HEART;
-
-    // // Then apply additional filters
-    // const matchesType = placeFilter === "all" || place.type === placeFilter;
-
-    // // Time filter
-    // let matchesTime = true;
-    // if (timeFilter !== "all" && place.visitTime) {
-    //   const hour = place.visitTime.getHours();
-    //   if (timeFilter === "morning" && (hour < 5 || hour >= 12))
-    //     matchesTime = false;
-    //   if (timeFilter === "afternoon" && (hour < 12 || hour >= 17))
-    //     matchesTime = false;
-    //   if (timeFilter === "evening" && (hour < 17 || hour >= 21))
-    //     matchesTime = false;
-    //   if (timeFilter === "night" && (hour < 21 || hour >= 5))
-    //     matchesTime = false;
-    // }
-
-    // // Date filter
-    // let matchesDate = true;
-    // if (dateFilter && place.visitTime) {
-    //   const visitDate = new Date(place.visitTime);
-    //   const filterDate = new Date(dateFilter);
-    //   matchesDate =
-    //     visitDate.getFullYear() === filterDate.getFullYear() &&
-    //     visitDate.getMonth() === filterDate.getMonth() &&
-    //     visitDate.getDate() === filterDate.getDate();
-    // }
-
-    // return matchesTab && matchesType && matchesTime && matchesDate;
-
-    return matchesTab;
-  });
+  const toggleFavorite = (placeId: string) => {
+    // 장소의 즐겨찾기 여부 토글 로직
+    console.log("Toggle favorite for:", placeId);
+  };
 
   // 새 일정 추가
   const handleAddEvent = (eventData: Omit<ScheduleItem, "id" | "color">) => {
@@ -420,352 +262,16 @@ export default function Chat() {
         eventData.type === "식사"
           ? "#F59E0B"
           : eventData.type === "관광"
-          ? "#88C58F"
-          : eventData.type === "숙박"
-          ? "#60A5FA"
-          : eventData.type === "이동"
-          ? "#A78BFA"
-          : "#94A3B8",
+            ? "#88C58F"
+            : eventData.type === "숙박"
+              ? "#60A5FA"
+              : eventData.type === "이동"
+                ? "#A78BFA"
+                : "#94A3B8",
     };
 
     setScheduleItems((prev) => [...prev, newEvent]);
   };
-
-  // 왼쪽 패널 컨텐츠
-  const leftPanelContent = (
-    <Tabs
-      defaultValue="map"
-      value={activeLeftTab}
-      onValueChange={setActiveLeftTab}
-      className="h-full flex flex-col"
-    >
-      <div className="border-b border-primary/10 px-4 py-2">
-        <TabsList className="w-full">
-          <TabsTrigger value="map" className="flex-1">
-            <Map className="h-4 w-4 mr-2" />
-            Map
-          </TabsTrigger>
-          <TabsTrigger value="calendar" className="flex-1">
-            <CalendarIcon className="h-4 w-4 mr-2" />
-            Calendar
-          </TabsTrigger>
-        </TabsList>
-      </div>
-
-      <div className="flex-1 relative">
-        <div
-          className={cn("absolute inset-0 transition-opacity", {
-            "opacity-100 visible pointer-events-auto": activeLeftTab === "map",
-            "opacity-0 invisible pointer-events-none": activeLeftTab !== "map",
-          })}
-        >
-          <GoogleMap />
-        </div>
-
-        <div
-          className={cn("absolute inset-0 transition-opacity", {
-            "opacity-100 visible pointer-events-auto":
-              activeLeftTab === "calendar",
-            "opacity-0 invisible pointer-events-none":
-              activeLeftTab !== "calendar",
-          })}
-        >
-          <WeeklyScheduleView
-            scheduleItems={scheduleItems}
-            places={likedPlaces}
-            onAddEvent={handleAddEvent}
-          />
-        </div>
-      </div>
-    </Tabs>
-  );
-
-  // 중앙 패널 컨텐츠
-  const middlePanelContent = (
-    <div className="h-full flex flex-col border-r border-primary/10">
-      <Tabs
-        defaultValue="confirmed"
-        value={activePlacesTab}
-        onValueChange={setActivePlacesTab}
-        className="h-full flex flex-col"
-      >
-        <div className="border-b border-primary/10 px-4 py-2">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="font-medium">Places</h2>
-            <div className="relative">
-              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search places..." className="pl-8 h-8 w-48" />
-            </div>
-          </div>
-          <TabsList className="w-full">
-            <TabsTrigger value="confirmed" className="flex-1">
-              <Star className="h-4 w-4 mr-2" />
-              Confirmed
-            </TabsTrigger>
-            <TabsTrigger value="candidates" className="flex-1">
-              <StarOff className="h-4 w-4 mr-2" />
-              Candidates
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        {/* Filters */}
-        <div className="border-b border-primary/10 p-2">
-          <div className="flex items-center gap-2 mb-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">Filters</span>
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            <div>
-              <Select value={placeFilter} onValueChange={setPlaceFilter}>
-                <SelectTrigger className="h-8 text-xs">
-                  <SelectValue placeholder="Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="식사">식사</SelectItem>
-                  <SelectItem value="관광">관광</SelectItem>
-                  <SelectItem value="숙박">숙박</SelectItem>
-                  <SelectItem value="이동">이동</SelectItem>
-                  <SelectItem value="기타">기타</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Select value={timeFilter} onValueChange={setTimeFilter}>
-                <SelectTrigger className="h-8 text-xs">
-                  <SelectValue placeholder="Time" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Times</SelectItem>
-                  <SelectItem value="morning">Morning</SelectItem>
-                  <SelectItem value="afternoon">Afternoon</SelectItem>
-                  <SelectItem value="evening">Evening</SelectItem>
-                  <SelectItem value="night">Night</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="h-8 text-xs w-full justify-start"
-                  >
-                    <CalendarIcon2 className="h-3.5 w-3.5 mr-1.5" />
-                    {dateFilter ? format(dateFilter, "MMM d") : "Date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="p-0 w-auto" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={dateFilter}
-                    onSelect={(date) => setDateFilter(date)}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4">
-          {filteredPlaces.length > 0 ? (
-            <div className="space-y-3">
-              {filteredPlaces.map((place) => (
-                <PlaceDialog
-                  key={place.placeId}
-                  place={place}
-                  activePlacesTab={activePlacesTab}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="h-full flex flex-col items-center justify-center text-center p-4">
-              <div className="bg-muted rounded-full p-3 mb-3">
-                {activePlacesTab === "confirmed" ? (
-                  <Star className="h-6 w-6 text-muted-foreground" />
-                ) : (
-                  <StarOff className="h-6 w-6 text-muted-foreground" />
-                )}
-              </div>
-              <h3 className="font-medium mb-1">
-                No {activePlacesTab === "confirmed" ? "confirmed" : "candidate"}{" "}
-                places yet
-              </h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                {activePlacesTab === "confirmed"
-                  ? "Places you confirm will appear here"
-                  : "Suggested places will appear here"}
-              </p>
-              {activePlacesTab === "candidates" && (
-                <Button size="sm" variant="outline" className="text-xs">
-                  <Hash className="h-3.5 w-3.5 mr-1.5" />
-                  Ask for recommendations
-                </Button>
-              )}
-            </div>
-          )}
-        </div>
-      </Tabs>
-    </div>
-  );
-
-  // 오른쪽 패널 컨텐츠
-  const rightPanelContent = (
-    <div className="h-full flex flex-col">
-      <div className="border-b border-primary/10 px-4 py-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <MessageSquare className="h-5 w-5 mr-2 text-primary" />
-            <h2 className="font-medium">Chat</h2>
-          </div>
-          <div className="flex items-center gap-1">
-            <Badge variant="outline" className="text-xs">
-              {participants.length} participants
-            </Badge>
-            <Button variant="ghost" size="icon" className="h-7 w-7">
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${
-              message.sender.id === "user1" ? "justify-end" : "justify-start"
-            }`}
-          >
-            <div
-              className={`flex ${
-                message.sender.id === "user1" ? "flex-row-reverse" : "flex-row"
-              } items-start gap-2 max-w-[90%]`}
-            >
-              <Avatar className="h-8 w-8 mt-1">
-                {message.sender.avatar ? (
-                  <AvatarImage
-                    src={message.sender.avatar}
-                    alt={message.sender.name}
-                  />
-                ) : (
-                  <AvatarFallback
-                    className={
-                      message.isAI
-                        ? "bg-secondary/30 text-secondary-foreground"
-                        : "bg-accent/30 text-accent-foreground"
-                    }
-                  >
-                    {message.isAI ? (
-                      <Bot className="h-4 w-4" />
-                    ) : (
-                      message.sender.name.charAt(0)
-                    )}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-medium">
-                    {message.sender.name}
-                  </span>
-                  <span className="text-xs text-foreground/50">
-                    {format(message.timestamp, "HH:mm")}
-                  </span>
-                </div>
-                <Card
-                  className={`${
-                    message.isAI ? "bg-secondary/20 border-secondary/30" : ""
-                  }`}
-                >
-                  <CardContent className="p-3 text-sm">
-                    {message.content}
-
-                    {/* Place Info Card */}
-                    {message.containsPlace && message.placeInfo && (
-                      <div className="mt-2 p-2 bg-background rounded-md border border-primary/20">
-                        <div className="flex items-start">
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-sm">
-                              {message.placeInfo.name}
-                            </h4>
-                            {message.placeInfo.address && (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {message.placeInfo.address}
-                              </p>
-                            )}
-                            {message.placeInfo.description && (
-                              <p className="text-xs mt-1">
-                                {message.placeInfo.description}
-                              </p>
-                            )}
-                            <div className="flex items-center gap-2 mt-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-7 text-xs"
-                                onClick={() =>
-                                  toggleConfirmed(message.placeInfo!.id)
-                                }
-                              >
-                                {message.placeInfo.isConfirmed
-                                  ? "Remove"
-                                  : "Add to Itinerary"}
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-7 text-xs"
-                                onClick={() =>
-                                  toggleFavorite(message.placeInfo!.id)
-                                }
-                              >
-                                {message.placeInfo.isFavorite
-                                  ? "Remove from Favorites"
-                                  : "Add to Favorites"}
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input Area */}
-      <div className="p-4 bg-background border-t">
-        <div className="flex space-x-2">
-          <Input
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Type your message or use # for commands..."
-            className="flex-1"
-          />
-          <Button
-            onClick={handleSendMessage}
-            disabled={!inputValue.trim()}
-            className="bg-accent text-accent-foreground hover:bg-accent/90"
-          >
-            <Send className="h-5 w-5" />
-          </Button>
-        </div>
-        <div className="flex items-center mt-2 text-xs text-muted-foreground">
-          <Info className="h-3 w-3 mr-1" />
-          <span>Try using #recommend to get AI suggestions</span>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="flex h-screen bg-muted/30 overflow-hidden">
@@ -852,9 +358,34 @@ export default function Chat() {
       {/* Main Content with Resizable Layout */}
       <div className="w-full mt-14">
         <ResizableLayout
-          leftContent={leftPanelContent}
-          middleContent={middlePanelContent}
-          rightContent={rightPanelContent}
+          leftContent={
+            <LeftPanel
+              activeTab={activeLeftTab}
+              onTabChange={setActiveLeftTab}
+              scheduleItems={scheduleItems}
+              places={likedPlaces}
+              onAddEvent={handleAddEvent}
+            />
+          }
+          middleContent={
+            <MiddlePanel
+              likedPlaces={likedPlaces}
+              activePlacesTab={activePlacesTab}
+              onActivePlacesTabChange={setActivePlacesTab}
+            />
+          }
+          rightContent={
+            <RightPanel
+              messages={messages}
+              participants={participants}
+              inputValue={inputValue}
+              onInputChange={setInputValue}
+              onSendMessage={handleSendMessage}
+              onKeyDown={handleKeyDown}
+              onToggleConfirmed={toggleConfirmed}
+              onToggleFavorite={toggleFavorite}
+            />
+          }
           leftVisible={leftPanelVisible}
           middleVisible={middlePanelVisible}
           rightVisible={rightPanelVisible}
