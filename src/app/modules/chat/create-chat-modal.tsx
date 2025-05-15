@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +20,9 @@ import {
   Check,
   X,
   ImageIcon,
+  Upload,
+  Link,
+  Trash2,
 } from "lucide-react";
 import type { DateRange } from "react-day-picker";
 import { Badge } from "@/components/ui/badge";
@@ -57,6 +60,10 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
   // UI state
   const [activeTab, setActiveTab] = useState("basic");
   const [coverImageType, setCoverImageType] = useState<"ai" | "upload">("ai");
+  const [uploadMethod, setUploadMethod] = useState<"file" | "url">("file");
+  const [imageUrl, setImageUrl] = useState("");
+  const [previewImage, setPreviewImage] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [coverImageUrl, setCoverImageUrl] = useState("");
 
   // Action state
@@ -76,6 +83,9 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
     setLinkCopied(false);
     setActiveTab("basic");
     setCoverImageType("ai");
+    setUploadMethod("file");
+    setImageUrl("https://images.unsplash.com/photo-1504107435030-c7cd582601b8?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+    setPreviewImage("");
     setCoverImageUrl("https://images.unsplash.com/photo-1504107435030-c7cd582601b8?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
     setNewTravelId(null);
   };
@@ -190,6 +200,33 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
     onOpenChange(false);
   };
 
+  // Handle file upload change
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const fileUrl = URL.createObjectURL(file);
+      setPreviewImage(fileUrl);
+      setCoverImageUrl(fileUrl);
+    }
+  };
+
+  // Handle URL input
+  const handleUrlSubmit = () => {
+    if (imageUrl) {
+      setPreviewImage(imageUrl);
+      setCoverImageUrl(imageUrl);
+    }
+  };
+
+  // Reset image selection
+  const handleResetImage = () => {
+    setPreviewImage("");
+    setImageUrl("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
@@ -264,21 +301,96 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
                     Based on your destination
                   </span>
                 </div>
-                <div
-                  className={cn(
-                    "border rounded-md p-2 flex flex-col items-center cursor-pointer hover:bg-accent/10",
-                    coverImageType === "upload" && "border-primary bg-accent/5"
-                  )}
-                  onClick={() => setCoverImageType("upload")}
-                >
-                  <ImageIcon className="h-8 w-8 mb-2 text-primary" />
-                  <span className="text-sm font-medium">Upload Image</span>
-                  <span className="text-xs text-muted-foreground">
-                    Use your own image
-                  </span>
-                </div>
+                {!previewImage ? (
+                  <div
+                    className={cn(
+                      "border rounded-md p-2 flex flex-col items-center cursor-pointer hover:bg-accent/10",
+                      coverImageType === "upload" && "border-primary bg-accent/5"
+                    )}
+                    onClick={() => setCoverImageType("upload")}
+                  >
+                    <ImageIcon className="h-8 w-8 mb-2 text-primary" />
+                    <span className="text-sm font-medium">Upload Image</span>
+                    <span className="text-xs text-muted-foreground">
+                      Use your own image
+                    </span>
+                  </div>
+                ) : (
+                  <div className="border rounded-md p-2 relative">
+                    <img
+                      src={previewImage}
+                      alt="Cover preview"
+                      className="w-full h-24 object-cover rounded-md"
+                    />
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="absolute top-1 right-1 h-6 w-6 bg-background/80 hover:bg-background"
+                      onClick={handleResetImage}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
+
+            {coverImageType === "upload" && !previewImage && (
+              <div className="space-y-2 border rounded-md p-4">
+                <div className="flex space-x-2 mb-4">
+                  <Button
+                    variant={uploadMethod === "file" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setUploadMethod("file")}
+                    className="flex-1"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    File Upload
+                  </Button>
+                  <Button
+                    variant={uploadMethod === "url" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setUploadMethod("url")}
+                    className="flex-1"
+                  >
+                    <Link className="h-4 w-4 mr-2" />
+                    Image URL
+                  </Button>
+                </div>
+
+                {uploadMethod === "file" ? (
+                  <div>
+                    <Input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="mb-2"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Select an image file from your device
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex space-x-2">
+                      <Input
+                        type="url"
+                        placeholder="https://example.com/image.jpg"
+                        value={imageUrl}
+                        onChange={(e) => setImageUrl(e.target.value)}
+                      />
+                      <Button onClick={handleUrlSubmit} disabled={!imageUrl}>
+                        Add
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Enter a valid image URL
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="flex justify-between">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
