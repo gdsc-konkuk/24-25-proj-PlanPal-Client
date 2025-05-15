@@ -1,34 +1,14 @@
-import {
-  IconType,
-  LikedPlace,
-  useLikedPlaces,
-} from "@/app/modules/map/store/liked-place-store";
-import { useMapStore } from "@/app/modules/map/store/map-store";
-import { Button } from "@/components/ui/button";
+import { LikedPlace } from "@/app/modules/map/store/liked-place-store";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Badge,
-  Bed,
-  Bus,
-  Camera,
-  Clock,
-  MapPin,
-  Star,
-  Utensils,
-} from "lucide-react";
+import { Bed, Bus, Camera, Clock, MapPin, Star, Utensils } from "lucide-react";
+import { ConfirmDialog } from "./confirm-dialog";
 
 interface PlaceCardProps {
   place: LikedPlace;
   activePlacesTab: "confirmed" | "candidates";
 }
 
-export function PlaceCard({ place, activePlacesTab }: PlaceCardProps) {
-  const map = useMapStore((state) => state.map);
-  const likedPlaces = useLikedPlaces((state) => state.likedPlaces);
-  const setIconType = useLikedPlaces((state) => state.setIconType);
-  const getIconType = useLikedPlaces((state) => state.getIconType);
-  const getMarker = useLikedPlaces((state) => state.getMarker);
-
+export function PlaceCard({ place }: PlaceCardProps) {
   const getTypeIcon = (type?: string) => {
     switch (type) {
       case "식사":
@@ -42,20 +22,6 @@ export function PlaceCard({ place, activePlacesTab }: PlaceCardProps) {
       default:
         return <MapPin className="h-4 w-4" />;
     }
-  };
-
-  const toggleConfirmed = (place: LikedPlace) => {
-    const placeId = place.placeId;
-    const isConfirmed = getIconType(placeId) === IconType.STAR;
-    setIconType(placeId, isConfirmed ? IconType.HEART : IconType.STAR);
-    const marker = getMarker(placeId);
-
-    const img = document.createElement("img");
-    img.src = !isConfirmed ? "/star.png" : "/heart.png";
-    img.style.width = "36px";
-    img.style.height = "36px";
-
-    if (marker) marker.content = img;
   };
 
   return (
@@ -101,12 +67,8 @@ export function PlaceCard({ place, activePlacesTab }: PlaceCardProps) {
                   <Clock className="h-3 w-3 mr-1" />
                   <span>Added by {place.addedBy}</span>
                 </div>
-                <div
-                  className="h-6 text-xs border rounded-md px-2 flex items-center justify-center cursor-pointer hover:bg-blue-500 hover:text-white transition-colors bg-black text-white"
-                  onClick={() => toggleConfirmed(place)}
-                >
-                  {activePlacesTab === "confirmed" ? "Remove" : "Confirm"}
-                </div>
+
+                <ConfirmDialog place={place} />
               </div>
             </div>
           </div>
