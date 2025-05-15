@@ -21,7 +21,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { AddEventForm } from "./add-event-form";
 import { LikedPlace } from "@/app/modules/map/store/liked-place-store";
 
-type ScheduleItem = {
+export type ScheduleItem = {
   id: string;
   placeId?: string;
   title: string;
@@ -142,8 +142,8 @@ export function WeeklyScheduleView({
             className={cn(
               "h-10 p-0 text-xs",
               isSameDay(day, new Date()) &&
-                !isSameDay(day, selectedDate) &&
-                "border-primary text-primary"
+              !isSameDay(day, selectedDate) &&
+              "border-primary text-primary"
             )}
             onClick={() => setSelectedDate(day)}
           >
@@ -193,7 +193,7 @@ export function WeeklyScheduleView({
                       const eventStartsHere =
                         event.startTime.getHours() === hour &&
                         Math.floor(event.startTime.getMinutes() / 30) * 30 ===
-                          minute;
+                        minute;
 
                       if (!eventStartsHere) return null;
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useApi } from "@/hooks/use-api";
+import { fetchAuth } from "@/lib/fetch-auth";
 
 // API response type for chat rooms list
 export interface ChatRoom {
@@ -72,13 +73,10 @@ GET
 /api/chat-rooms/{chatRoomId}/invite
 채팅방 초대 코드 조회
 */
-export function getChatRoomInviteCode(
-  chatRoomId: number
-): Promise<{ inviteCode: string }> {
-  const api = useApi();
-  return api(
+export function getChatRoomInviteCode(chatRoomId: number): Promise<string> {
+  return fetchAuth(
     `${process.env.NEXT_PUBLIC_API_SERVER_URL}/chat-rooms/${chatRoomId}/invite`
-  );
+  ).then((res) => res.text());
 }
 
 /*
