@@ -1,5 +1,3 @@
-//@ts-nocheck
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,11 +6,13 @@ import { ResizableLayout } from "@/components/resizable-layout";
 import { IconType, useLikedPlaces } from "@/app/modules/map/store/liked-place-store";
 import { useMapStore } from "@/app/modules/map/store/map-store";
 import { useApi } from "@/hooks/use-api";
-import { MessageType, ParticipantType, ScheduleItem } from "../types";
+import { MessageType, ParticipantType, PlacesTabType, EventDataType, PlaceType } from "../types";
 import { LeftPanel } from "./left-panel";
 import { MiddlePanel } from "./middle-panel";
 import { RightPanel } from "./right-panel";
 import { ChatHeader } from "./components/chat-header";
+import type { ScheduleItem } from "@/components/weekly-schedule-view";
+
 
 export default function Chat() {
   const router = useRouter();
@@ -47,7 +47,7 @@ export default function Chat() {
   const [rightPanelVisible, setRightPanelVisible] = useState(true);
 
   const [activeLeftTab, setActiveLeftTab] = useState("map");
-  const [activePlacesTab, setActivePlacesTab] = useState("confirmed");
+  const [activePlacesTab, setActivePlacesTab] = useState<PlacesTabType>("confirmed");
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>([]);
 
   const map = useMapStore((state) => state.map);
@@ -165,7 +165,7 @@ export default function Chat() {
           isConfirmed: false,
           visitTime: new Date(2023, 5, 18, 9, 0),
           duration: 120,
-          type: "관광",
+          type: "관광" as "식사" | "관광" | "숙박" | "이동" | "기타",
         };
       } else if (
         inputValue.toLowerCase().includes("plan") ||
@@ -247,6 +247,7 @@ export default function Chat() {
     const newEvent: ScheduleItem = {
       id: `schedule-${Date.now()}`,
       ...eventData,
+      placeId: eventData.placeId || `temp-${Date.now()}`, // Provide a fallback for placeId
       color:
         eventData.type === "식사"
           ? "#F59E0B"

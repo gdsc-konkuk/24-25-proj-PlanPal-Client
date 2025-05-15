@@ -11,11 +11,12 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { LikedPlace, IconType } from "@/app/modules/map/store/liked-place-store";
 import { PlaceDialog } from "./components/place-dialog";
+import { PlacesTabType } from "../types";
 
 interface MiddlePanelProps {
   likedPlaces: LikedPlace[];
-  activePlacesTab: "confirmed" | "candidates";
-  onActivePlacesTabChange: (value: "confirmed" | "candidates") => void;
+  activePlacesTab: PlacesTabType;
+  onActivePlacesTabChange: (value: PlacesTabType) => void;
 }
 
 export const MiddlePanel = ({
