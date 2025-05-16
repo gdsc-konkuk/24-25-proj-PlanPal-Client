@@ -26,7 +26,7 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
     if (get().socket) return;
 
     const socket = new WebSocket(
-      `${process.env.NEXT_PUBLIC_SOCKET_SERVER_URL}/ws/chat?roomId=${roomId}&userName=${userName}`
+      `${process.env.NEXT_PUBLIC_SOCKET_SERVER_URL}?roomId=${roomId}&userName=${userName}`
     );
 
     socket.onopen = () => {
