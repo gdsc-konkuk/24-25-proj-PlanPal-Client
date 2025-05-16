@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   format,
@@ -15,7 +15,7 @@ import {
   isBefore,
   isAfter,
 } from "date-fns";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { AddEventForm } from "./add-event-form";
@@ -28,7 +28,7 @@ export type ScheduleItem = {
   date: Date;
   startTime: Date;
   endTime: Date;
-  type: "Food" | "Tour" | "Stay" | "Move" | "Etc";
+  type: string | "Food" | "Tour" | "Stay" | "Move" | "Etc";
   description?: string;
   color?: string;
 };
@@ -37,7 +37,8 @@ interface WeeklyScheduleViewProps {
   scheduleItems: ScheduleItem[];
   places: LikedPlace[];
   onAddEvent: (event: Omit<ScheduleItem, "id" | "color">) => void;
-  chatRoomId: string; // Add chatRoomId prop
+  chatRoomId: string;
+  refreshSchedules?: () => void; // Add refreshSchedules prop
 }
 
 // 시간 간격 (30분 단위)
@@ -61,18 +62,37 @@ export function WeeklyScheduleView({
   places,
   onAddEvent,
   chatRoomId,
+  refreshSchedules,
 }: WeeklyScheduleViewProps) {
   const [weekStart, setWeekStart] = useState<Date>(
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showAddEventDialog, setShowAddEventDialog] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // 현재 주의 날짜들
   const daysOfWeek = eachDayOfInterval({
     start: weekStart,
     end: endOfWeek(weekStart, { weekStartsOn: 1 }),
   });
+
+  // Force a refresh when week changes or component mounts
+  useEffect(() => {
+    if (refreshSchedules) {
+      refreshSchedules();
+    }
+  }, [weekStart, refreshSchedules]);
+
+  // Handle manual refresh
+  const handleRefresh = () => {
+    if (refreshSchedules) {
+      setIsRefreshing(true);
+      refreshSchedules();
+      // Reset refreshing state after a delay
+      setTimeout(() => setIsRefreshing(false), 1000);
+    }
+  };
 
   // 이전/다음 주로 이동
   const goToPreviousWeek = () => {
@@ -129,6 +149,16 @@ export function WeeklyScheduleView({
           <Button variant="outline" size="icon" onClick={goToNextWeek}>
             <ChevronRight className="h-4 w-4" />
           </Button>
+          {refreshSchedules && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleRefresh}
+              className={isRefreshing ? "animate-spin" : ""}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 
@@ -216,12 +246,9 @@ export function WeeklyScheduleView({
                           key={event.id}
                           className="absolute rounded-md p-1 overflow-hidden text-xs"
                           style={{
-                            backgroundColor: event.color
-                              ? `${event.color}20`
-                              : `${TYPE_COLORS[event.type]}20`,
-                            borderLeft: event.color
-                              ? `3px solid ${event.color}`
-                              : `3px solid ${TYPE_COLORS[event.type]}`,
+                            backgroundColor: `${event.color}20`
+                            ,
+                            borderLeft: `3px solid ${event.color}`,
                             top: `${index * 1.5}rem`,
                             height: `${heightInSlots * 1.5}rem`,
                             left: "0.125rem",
