@@ -52,7 +52,7 @@ export function ChatHeader({
       if (!isNaN(chatRoomId)) {
         getChatRoomInviteCode(chatRoomId)
           .then(response => {
-            setInviteCode(response);
+            setInviteCode(response.inviteCode);
           })
           .catch(error => {
             console.error("Failed to fetch invite code:", error);
@@ -96,8 +96,7 @@ export function ChatHeader({
 
         {travelId && inviteCode && (
           <div className="flex items-center ml-2">
-            <LinkIcon className="h-4 w-4 text-foreground/70 mr-2 shrink-0" />
-            <span className="text-sm font-medium">Invite Code:</span>
+            {/* <LinkIcon className="h-4 w-4 text-foreground/70 mr-2 shrink-0" /> */}
             <Button
               variant="outline"
               size="sm"
@@ -119,6 +118,7 @@ export function ChatHeader({
                   });
               }}
             >
+              <span className="text-sm font-medium">Copy invite code:</span>
               <span className="truncate max-w-[100px]">{isLoading ? "Loading..." : inviteCode}</span>
               <Clipboard className="h-4 w-4" />
             </Button>
