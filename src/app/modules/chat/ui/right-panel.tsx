@@ -11,7 +11,7 @@ interface RightPanelProps {
   messages: ChatMessage[];
   inputValue: string;
   onInputChange: (value: string) => void;
-  onSendMessage: () => void;
+  onAIRequest: (type: "aiRequest" | "chat") => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
   onSetIsComposing: (isComposing: boolean) => void;
 }
@@ -20,7 +20,7 @@ export const RightPanel = ({
   messages,
   inputValue,
   onInputChange,
-  onSendMessage,
+  onAIRequest,
   onKeyDown,
   onSetIsComposing,
 }: RightPanelProps) => {
@@ -82,7 +82,7 @@ export const RightPanel = ({
             className="flex-1"
           />
           <Button
-            onClick={onSendMessage}
+            onClick={() => onAIRequest("aiRequest")}
             disabled={!inputValue.trim()}
             className="bg-accent text-accent-foreground hover:bg-accent/90"
           >
