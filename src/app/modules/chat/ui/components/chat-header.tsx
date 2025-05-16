@@ -136,9 +136,9 @@ export function ChatHeader({
         >
           <MapIcon className="h-4 w-4" />
           {leftPanelVisible ? (
-            <EyeOffIcon className="h-3 w-3" />
-          ) : (
             <EyeIcon className="h-3 w-3" />
+          ) : (
+            <EyeOffIcon className="h-3 w-3" />
           )}
         </Button>
         <Button
@@ -150,9 +150,9 @@ export function ChatHeader({
         >
           <ListIcon className="h-4 w-4" />
           {middlePanelVisible ? (
-            <EyeOffIcon className="h-3 w-3" />
-          ) : (
             <EyeIcon className="h-3 w-3" />
+          ) : (
+            <EyeOffIcon className="h-3 w-3" />
           )}
         </Button>
         <Button
@@ -164,9 +164,9 @@ export function ChatHeader({
         >
           <MessageCircleIcon className="h-4 w-4" />
           {rightPanelVisible ? (
-            <EyeOffIcon className="h-3 w-3" />
-          ) : (
             <EyeIcon className="h-3 w-3" />
+          ) : (
+            <EyeOffIcon className="h-3 w-3" />
           )}
         </Button>
         <Avatar className="h-8 w-8">
