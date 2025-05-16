@@ -13,6 +13,7 @@ import type { ScheduleItem } from "@/components/weekly-schedule-view";
 import { useAuthStore } from "@/store/auth-store";
 import { parseJwt } from "@/lib/parseJwt";
 import { WebSocketInitializer } from "../initializer/websocket-initializer";
+import { useWebSocketStore } from "../store/websocket-store";
 
 export default function Chat() {
   const searchParams = useSearchParams();
@@ -52,6 +53,9 @@ export default function Chat() {
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>([]);
 
   const likedPlaces = useLikedPlaces((state) => state.likedPlaces);
+
+  const sendMessage = useWebSocketStore((state) => state.sendMessage);
+  const [isComposing, setIsComposing] = useState(false);
 
   // 패널 가시성 변경 핸들러 - 이 함수는 ResizableLayout에서만 호출되도록 수정
   const handlePanelVisibilityChange = (
@@ -111,6 +115,8 @@ export default function Chat() {
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
+
+    sendMessage("chat", inputValue);
 
     // Add user message
     const userMessage: MessageType = {
@@ -221,7 +227,7 @@ export default function Chat() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !isComposing) {
       e.preventDefault();
       handleSendMessage();
     }
@@ -301,6 +307,7 @@ export default function Chat() {
               onKeyDown={handleKeyDown}
               onToggleConfirmed={toggleConfirmed}
               onToggleFavorite={toggleFavorite}
+              onSetIsComposing={(value) => setIsComposing(value)}
             />
           }
           leftVisible={leftPanelVisible}

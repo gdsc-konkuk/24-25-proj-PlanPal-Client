@@ -13,7 +13,6 @@ export function WebSocketInitializer({ roomId }: WebSocketInitializerProps) {
   const connect = useWebSocketStore((s) => s.connect);
   const accessToken = useAuthStore((s) => s.accessToken);
   const userName = encodeURIComponent(parseJwt(accessToken!).name);
-  console.log("WebSocketInitializer", roomId, userName);
 
   useEffect(() => {
     connect(roomId, userName);

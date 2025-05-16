@@ -5,7 +5,7 @@ type WebSocketStore = {
   chatMessages: string[];
   refreshMapTrigger: number;
   connect: (roomId: string, userName: string) => void;
-  sendMessage: (msg: any) => void;
+  sendMessage: (type: "chat" | "ai", msg: string) => void;
 };
 
 export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
@@ -17,7 +17,7 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
     if (get().socket) return;
 
     const socket = new WebSocket(
-      `${process.env.NEXT_PUBLIC_SOCKET_SERVER_URL}/chat?roomId=${roomId}&userName=${userName}`
+      `${process.env.NEXT_PUBLIC_SOCKET_SERVER_URL}/ws/chat?roomId=${roomId}&userName=${userName}`
     );
 
     socket.onopen = () => {
@@ -49,6 +49,7 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
     };
 
     socket.onerror = (e) => console.error("WebSocket error", e);
+
     socket.onclose = () => {
       console.warn("WebSocket closed");
       set({ socket: null });
@@ -57,10 +58,15 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
     set({ socket });
   },
 
-  sendMessage: (msg) => {
+  sendMessage: (type, msg) => {
     const socket = get().socket;
     if (socket?.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify(msg));
+      socket.send(
+        JSON.stringify({
+          type,
+          text: msg,
+        })
+      );
     } else {
       console.warn("WebSocket is not open.");
     }
