@@ -11,13 +11,13 @@ interface PlaceCardProps {
 export function PlaceCard({ place }: PlaceCardProps) {
   const getTypeIcon = (type?: string) => {
     switch (type) {
-      case "식사":
+      case "Food":
         return <Utensils className="h-4 w-4" />;
-      case "관광":
+      case "Tour":
         return <Camera className="h-4 w-4" />;
-      case "숙박":
+      case "Stay":
         return <Bed className="h-4 w-4" />;
-      case "이동":
+      case "Move":
         return <Bus className="h-4 w-4" />;
       default:
         return <MapPin className="h-4 w-4" />;

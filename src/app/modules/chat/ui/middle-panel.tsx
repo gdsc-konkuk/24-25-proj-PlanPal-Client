@@ -162,7 +162,6 @@ export const MiddlePanel = ({
                   key={place.placeId}
                   place={place}
                   activePlacesTab={activePlacesTab}
-                // onAddEvent={onAddEvent}
                 />
               ))}
             </div>

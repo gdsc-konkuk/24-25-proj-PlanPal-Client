@@ -51,7 +51,7 @@ export function PlaceDialog({ place, activePlacesTab }: PlaceCardProps) {
         <DialogHeader>
           <DialogTitle>{place.name}</DialogTitle>
           <DialogDescription asChild>
-            <div className="flex flex-col gap-2 max-h-[600px] overflow-scroll mt-4">
+            <div className="flex flex-col gap-2 max-h-[600px] overflow-hidden mt-4">
               {placeInfo?.photos && (
                 <img
                   src={placeInfo.photos[0].getURI()}
