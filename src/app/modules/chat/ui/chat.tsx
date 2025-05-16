@@ -14,6 +14,7 @@ import { useAuthStore } from "@/store/auth-store";
 import { parseJwt } from "@/lib/parseJwt";
 import { WebSocketInitializer } from "../initializer/websocket-initializer";
 import { useWebSocketStore } from "../store/websocket-store";
+import { usePanelVisibilityStore } from "../store/panel-visibility-store";
 
 export default function Chat() {
   const searchParams = useSearchParams();
@@ -23,10 +24,14 @@ export default function Chat() {
 
   const [inputValue, setInputValue] = useState("");
 
-  // 패널 가시성 상태
-  const [leftPanelVisible, setLeftPanelVisible] = useState(true);
-  const [middlePanelVisible, setMiddlePanelVisible] = useState(true);
-  const [rightPanelVisible, setRightPanelVisible] = useState(true);
+  // 패널 가시성 상태를 zustand 스토어에서 가져옴
+  const {
+    leftPanelVisible,
+    middlePanelVisible,
+    rightPanelVisible,
+    setPanelVisibility,
+    togglePanel
+  } = usePanelVisibilityStore();
 
   const [activeLeftTab, setActiveLeftTab] = useState("map");
   const [activePlacesTab, setActivePlacesTab] =
@@ -41,61 +46,18 @@ export default function Chat() {
   const [isComposing, setIsComposing] = useState(false);
   console.log(chatMessages);
 
-  // 패널 가시성 변경 핸들러 - 이 함수는 ResizableLayout에서만 호출되도록 수정
+  // 패널 가시성 변경 핸들러 - 스토어의 함수 사용
   const handlePanelVisibilityChange = (
     panel: "left" | "middle" | "right",
     visible: boolean
   ) => {
-    // 최소 1개의 패널은 항상 표시되어야 함
-    const currentVisibleCount = [
-      panel === "left" ? visible : leftPanelVisible,
-      panel === "middle" ? visible : middlePanelVisible,
-      panel === "right" ? visible : rightPanelVisible,
-    ].filter(Boolean).length;
-
-    if (currentVisibleCount === 0) return;
-
-    if (panel === "left") setLeftPanelVisible(visible);
-    else if (panel === "middle") setMiddlePanelVisible(visible);
-    else if (panel === "right") setRightPanelVisible(visible);
+    setPanelVisibility(panel, visible);
   };
 
-  // 패널 토글 핸들러 - 버튼 클릭 시 호출되는 함수
-  const toggleLeftPanel = () => {
-    // 이미 하나만 켜져 있고 왼쪽 패널이 켜져 있는 경우 토글 불가
-    const visibleCount = [
-      leftPanelVisible,
-      middlePanelVisible,
-      rightPanelVisible,
-    ].filter(Boolean).length;
-    if (visibleCount === 1 && leftPanelVisible) return;
-
-    setLeftPanelVisible(!leftPanelVisible);
-  };
-
-  const toggleMiddlePanel = () => {
-    // 이미 하나만 켜져 있고 중앙 패널이 켜져 있는 경우 토글 불가
-    const visibleCount = [
-      leftPanelVisible,
-      middlePanelVisible,
-      rightPanelVisible,
-    ].filter(Boolean).length;
-    if (visibleCount === 1 && middlePanelVisible) return;
-
-    setMiddlePanelVisible(!middlePanelVisible);
-  };
-
-  const toggleRightPanel = () => {
-    // 이미 하나만 켜져 있고 오른쪽 패널이 켜져 있는 경우 토글 불가
-    const visibleCount = [
-      leftPanelVisible,
-      middlePanelVisible,
-      rightPanelVisible,
-    ].filter(Boolean).length;
-    if (visibleCount === 1 && rightPanelVisible) return;
-
-    setRightPanelVisible(!rightPanelVisible);
-  };
+  // 패널 토글 핸들러 - 스토어의 함수 사용
+  const toggleLeftPanel = () => togglePanel('left');
+  const toggleMiddlePanel = () => togglePanel('middle');
+  const toggleRightPanel = () => togglePanel('right');
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
