@@ -157,11 +157,12 @@ export const MiddlePanel = ({
         <div className="flex-1 overflow-y-auto p-4">
           {filteredPlaces.length > 0 ? (
             <div className="space-y-3">
-              {filteredPlaces.map((place) => (
+              {filteredPlaces.map((place, i) => (
                 <PlaceDialog
-                  key={place.placeId}
+                  key={`place-dialog-${place.placeId}-${i}`}
                   place={place}
                   activePlacesTab={activePlacesTab}
+                // onAddEvent={onAddEvent}
                 />
               ))}
             </div>

@@ -33,6 +33,7 @@ type LikedPlaceStore = {
   ) => google.maps.marker.AdvancedMarkerElement | undefined;
   setIconType: (placeId: string, iconType: IconType) => void;
   getIconType: (placeId: string) => IconType | undefined;
+  setLikedPlacesNull: () => void;
 };
 
 export const useLikedPlaces = create<LikedPlaceStore>((set, get) => ({
@@ -62,4 +63,8 @@ export const useLikedPlaces = create<LikedPlaceStore>((set, get) => ({
     })),
   getIconType: (placeId) =>
     get().likedPlaces.find((p) => p.placeId === placeId)?.iconType,
+  setLikedPlacesNull: () =>
+    set(() => ({
+      likedPlaces: [],
+    })),
 }));
