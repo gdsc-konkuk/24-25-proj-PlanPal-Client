@@ -1,14 +1,17 @@
-import type React from "react"
-
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { format, addMinutes } from "date-fns"
-import { Calendar } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { useLikedPlaces, LikedPlace } from "@/app/modules/map/store/liked-place-store"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar as CalendarComponent } from "@/components/ui/calendar"
+import { Calendar } from "@/components/ui/calendar"
+import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { format } from "date-fns"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
 type EventType = "Food" | "Tour" | "Stay" | "Move" | "Etc"
 
@@ -21,137 +24,374 @@ interface AddEventFormProps {
     endTime: Date
     type: EventType
     description?: string
+    placeId?: string
   }) => void
   onCancel: () => void
 }
 
+const eventFormSchema = z.object({
+  placeId: z.string({
+    required_error: "Please select a place",
+  }),
+  startDate: z.date({
+    required_error: "Start date is required",
+  }),
+  endDate: z.date({
+    required_error: "End date is required",
+  }),
+})
+
 export function AddEventForm({ selectedDate, onAddEvent, onCancel }: AddEventFormProps) {
-  const [title, setTitle] = useState("")
-  const [date, setDate] = useState<Date | undefined>(selectedDate)
-  const [startTime, setStartTime] = useState("09:00")
-  const [duration, setDuration] = useState("60")
-  const [eventType, setEventType] = useState<EventType>("Tour")
-  const [description, setDescription] = useState("")
+  const likedPlaces = useLikedPlaces((state) => state.likedPlaces)
+  const [open, setOpen] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const form = useForm<z.infer<typeof eventFormSchema>>({
+    resolver: zodResolver(eventFormSchema),
+    defaultValues: {
+      startDate: selectedDate,
+      endDate: new Date(selectedDate.getTime() + 60 * 60 * 1000), // Default to 1 hour later
+    },
+  })
 
-    if (!title || !date || !startTime || !duration) return
+  function handleDateSelect(
+    field: "startDate" | "endDate",
+    date: Date | undefined
+  ) {
+    if (date) {
+      form.setValue(field, date);
+    }
+  }
 
-    // Parse start time
-    const [hours, minutes] = startTime.split(":").map(Number)
-    const startDateTime = new Date(date)
-    startDateTime.setHours(hours, minutes, 0, 0)
+  function handleTimeChange(
+    field: "startDate" | "endDate",
+    type: "hour" | "minute" | "ampm",
+    value: string
+  ) {
+    const currentDate = form.getValues(field) || new Date();
+    let newDate = new Date(currentDate);
 
-    // Calculate end time based on duration
-    const endDateTime = addMinutes(startDateTime, Number.parseInt(duration))
+    if (type === "hour") {
+      const hour = parseInt(value, 10);
+      newDate.setHours(newDate.getHours() >= 12 ? hour + 12 : hour);
+    } else if (type === "minute") {
+      newDate.setMinutes(parseInt(value, 10));
+    } else if (type === "ampm") {
+      const hours = newDate.getHours();
+      if (value === "AM" && hours >= 12) {
+        newDate.setHours(hours - 12);
+      } else if (value === "PM" && hours < 12) {
+        newDate.setHours(hours + 12);
+      }
+    }
+
+    form.setValue(field, newDate);
+  }
+
+  function onSubmit(data: z.infer<typeof eventFormSchema>) {
+    // Find the selected place details
+    const selectedPlace = likedPlaces.find(place => place.placeId === data.placeId)
+
+    if (!selectedPlace) return
 
     onAddEvent({
-      title,
-      date,
-      startTime: startDateTime,
-      endTime: endDateTime,
-      type: eventType,
-      description: description || undefined,
+      title: selectedPlace.name,
+      date: data.startDate,
+      startTime: data.startDate,
+      endTime: data.endDate,
+      type: (selectedPlace.type as EventType) || "Etc",
+      placeId: selectedPlace.placeId
     })
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="event-title">Title</Label>
-        <Input
-          id="event-title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="ex) Tour into the Konkuk University"
-          required
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="placeId"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Place</FormLabel>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={open}
+                      className="w-full justify-between"
+                    >
+                      {field.value
+                        ? likedPlaces.find((place) => place.placeId === field.value)?.name
+                        : "Select a place"}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-[300px] p-0">
+                  <Command>
+                    <CommandInput placeholder="Search place..." />
+                    <CommandEmpty>No place found.</CommandEmpty>
+                    <CommandList>
+                      <CommandGroup>
+                        {likedPlaces.map((place) => (
+                          <CommandItem
+                            key={place.placeId}
+                            value={place.placeId}
+                            onSelect={() => {
+                              form.setValue("placeId", place.placeId)
+                              setOpen(false)
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                field.value === place.placeId ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {place.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>Date</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-start text-left font-normal">
-                <Calendar className="mr-2 h-4 w-4" />
-                {date ? format(date, "yyyy.MM.dd") : "select date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <CalendarComponent mode="single" selected={date} onSelect={setDate} initialFocus />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="event-type">Type</Label>
-          <Select value={eventType} onValueChange={(value) => setEventType(value as EventType)}>
-            <SelectTrigger id="event-type">
-              <SelectValue placeholder="select type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Food">Food</SelectItem>
-              <SelectItem value="Tour">Tour</SelectItem>
-              <SelectItem value="Stay">Stay</SelectItem>
-              <SelectItem value="Move">Move</SelectItem>
-              <SelectItem value="Etc">Etc</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="start-time">Start Time</Label>
-          <Input
-            id="start-time"
-            type="time"
-            value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="duration">Duration (min)</Label>
-          <Select value={duration} onValueChange={setDuration}>
-            <SelectTrigger id="duration">
-              <SelectValue placeholder="Duration" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="30">30 min</SelectItem>
-              <SelectItem value="60">1 hour</SelectItem>
-              <SelectItem value="90">1 hour 30 min</SelectItem>
-              <SelectItem value="120">2 hours</SelectItem>
-              <SelectItem value="180">3 hours</SelectItem>
-              <SelectItem value="240">4 hours</SelectItem>
-              <SelectItem value="360">6 hours</SelectItem>
-              <SelectItem value="480">8 hours</SelectItem>
-              <SelectItem value="720">12 hours</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="event-description">Description (Optional)</Label>
-        <Input
-          id="event-description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Additional information about the event"
+        <FormField
+          control={form.control}
+          name="startDate"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Start Date & Time (AM / PM)</FormLabel>
+              <Popover modal>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full pl-3 text-left font-normal",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value ? (
+                        format(field.value, "yyyy.MM.dd hh:mm aa")
+                      ) : (
+                        <span>YYYY.MM.DD  hh:mm  AM/PM</span>
+                      )}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <div className="sm:flex">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={(date) => handleDateSelect("startDate", date)}
+                      initialFocus
+                    />
+                    <div className="flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x">
+                      <ScrollArea className="w-64 sm:w-auto">
+                        <div className="flex sm:flex-col p-2">
+                          {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
+                            <Button
+                              key={hour}
+                              size="icon"
+                              variant={
+                                field.value &&
+                                  field.value.getHours() % 12 === hour % 12
+                                  ? "default"
+                                  : "ghost"
+                              }
+                              className="sm:w-full shrink-0 aspect-square"
+                              onClick={() =>
+                                handleTimeChange("startDate", "hour", hour.toString())
+                              }
+                            >
+                              {hour}
+                            </Button>
+                          ))}
+                        </div>
+                        <ScrollBar orientation="horizontal" className="sm:hidden" />
+                      </ScrollArea>
+                      <ScrollArea className="w-64 sm:w-auto">
+                        <div className="flex sm:flex-col p-2">
+                          {Array.from({ length: 12 }, (_, i) => i * 5).map(
+                            (minute) => (
+                              <Button
+                                key={minute}
+                                size="icon"
+                                variant={
+                                  field.value && field.value.getMinutes() === minute
+                                    ? "default"
+                                    : "ghost"
+                                }
+                                className="sm:w-full shrink-0 aspect-square"
+                                onClick={() =>
+                                  handleTimeChange("startDate", "minute", minute.toString())
+                                }
+                              >
+                                {minute.toString().padStart(2, "0")}
+                              </Button>
+                            )
+                          )}
+                        </div>
+                        <ScrollBar orientation="horizontal" className="sm:hidden" />
+                      </ScrollArea>
+                      <ScrollArea className="">
+                        <div className="flex sm:flex-col p-2">
+                          {["AM", "PM"].map((ampm) => (
+                            <Button
+                              key={ampm}
+                              size="icon"
+                              variant={
+                                field.value &&
+                                  ((ampm === "AM" && field.value.getHours() < 12) ||
+                                    (ampm === "PM" && field.value.getHours() >= 12))
+                                  ? "default"
+                                  : "ghost"
+                              }
+                              className="sm:w-full shrink-0 aspect-square"
+                              onClick={() => handleTimeChange("startDate", "ampm", ampm)}
+                            >
+                              {ampm}
+                            </Button>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="flex justify-end space-x-2 pt-2">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit">Add Event</Button>
-      </div>
-    </form>
+        <FormField
+          control={form.control}
+          name="endDate"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>End Date & Time (AM / PM)</FormLabel>
+              <Popover modal>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full pl-3 text-left font-normal",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value ? (
+                        format(field.value, "yyyy.MM.dd hh:mm aa")
+                      ) : (
+                        <span>YYYY.MM.DD  hh:mm  AM/PM</span>
+                      )}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <div className="sm:flex">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={(date) => handleDateSelect("endDate", date)}
+                      initialFocus
+                    />
+                    <div className="flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x">
+                      <ScrollArea className="w-64 sm:w-auto">
+                        <div className="flex sm:flex-col p-2">
+                          {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
+                            <Button
+                              key={hour}
+                              size="icon"
+                              variant={
+                                field.value &&
+                                  field.value.getHours() % 12 === hour % 12
+                                  ? "default"
+                                  : "ghost"
+                              }
+                              className="sm:w-full shrink-0 aspect-square"
+                              onClick={() =>
+                                handleTimeChange("endDate", "hour", hour.toString())
+                              }
+                            >
+                              {hour}
+                            </Button>
+                          ))}
+                        </div>
+                        <ScrollBar orientation="horizontal" className="sm:hidden" />
+                      </ScrollArea>
+                      <ScrollArea className="w-64 sm:w-auto">
+                        <div className="flex sm:flex-col p-2">
+                          {Array.from({ length: 12 }, (_, i) => i * 5).map(
+                            (minute) => (
+                              <Button
+                                key={minute}
+                                size="icon"
+                                variant={
+                                  field.value && field.value.getMinutes() === minute
+                                    ? "default"
+                                    : "ghost"
+                                }
+                                className="sm:w-full shrink-0 aspect-square"
+                                onClick={() =>
+                                  handleTimeChange("endDate", "minute", minute.toString())
+                                }
+                              >
+                                {minute.toString().padStart(2, "0")}
+                              </Button>
+                            )
+                          )}
+                        </div>
+                        <ScrollBar orientation="horizontal" className="sm:hidden" />
+                      </ScrollArea>
+                      <ScrollArea className="">
+                        <div className="flex sm:flex-col p-2">
+                          {["AM", "PM"].map((ampm) => (
+                            <Button
+                              key={ampm}
+                              size="icon"
+                              variant={
+                                field.value &&
+                                  ((ampm === "AM" && field.value.getHours() < 12) ||
+                                    (ampm === "PM" && field.value.getHours() >= 12))
+                                  ? "default"
+                                  : "ghost"
+                              }
+                              className="sm:w-full shrink-0 aspect-square"
+                              onClick={() => handleTimeChange("endDate", "ampm", ampm)}
+                            >
+                              {ampm}
+                            </Button>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="flex justify-end space-x-2 pt-2">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="submit">Add Event</Button>
+        </div>
+      </form>
+    </Form>
   )
 }
 
