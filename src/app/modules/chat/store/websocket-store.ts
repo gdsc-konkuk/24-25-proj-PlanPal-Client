@@ -14,7 +14,7 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
   socket: null,
   chatMessages: [
     {
-      type: "ai",
+      type: "aiResponse",
       text: "Welcome to your group travel planning session! I'm your AI travel assistant. Tell me where you're thinking of going, and I can help with suggestions, cultural insights, and local recommendations. You can also invite friends to join this planning session!",
       senderName: "ai",
       sendAt: new Date().toISOString(),
@@ -38,13 +38,14 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
         const data: ChatMessage = JSON.parse(event.data);
         switch (data.type) {
           case "chat":
-          case "ai":
+          case "aiResponse":
+          case "aiRequest":
             set((state) => ({
               chatMessages: [...state.chatMessages, data],
             }));
             break;
 
-          case "refresh":
+          case "refreshMap":
             set((state) => ({
               refreshMapTrigger: state.refreshMapTrigger + 1,
             }));
@@ -66,7 +67,7 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
       set((state) => ({
         chatMessages: [
           ...state.chatMessages,
-          { type: "ai", text: "WebSocket connection closed." },
+          { type: "aiResponse", text: "WebSocket connection closed." },
         ],
       }));
     };
