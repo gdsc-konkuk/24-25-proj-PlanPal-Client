@@ -48,9 +48,9 @@ export function PlaceCard({ place }: PlaceCardProps) {
               </div>
 
               <div className="flex items-center justify-between mt-4">
-                {place.description && (
+                {place.content && (
                   <p className="text-xs text-foreground/80 line-clamp-2">
-                    {place.description}
+                    {place.content}
                   </p>
                 )}
 
