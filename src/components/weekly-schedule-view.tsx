@@ -47,7 +47,7 @@ const HOUR_INTERVALS = Array.from({ length: 48 }, (_, i) => {
 });
 
 // 이벤트 유형별 색상
-const TYPE_COLORS = {
+export const TYPE_COLORS = {
   Food: "#F59E0B",
   Tour: "#88C58F",
   Stay: "#60A5FA",

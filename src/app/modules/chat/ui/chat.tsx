@@ -163,6 +163,7 @@ export default function Chat() {
               likedPlaces={likedPlaces}
               activePlacesTab={activePlacesTab}
               onActivePlacesTabChange={setActivePlacesTab}
+              onAddEvent={handleAddEvent}
             />
           }
           rightContent={

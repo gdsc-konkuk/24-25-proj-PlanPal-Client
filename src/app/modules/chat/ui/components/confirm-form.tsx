@@ -26,20 +26,40 @@ import { ConfirmFormSchema } from "../../lib/confirm-form-schema";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { LikedPlace } from "@/app/modules/map/store/liked-place-store";
+import type { ScheduleItem } from "@/components/weekly-schedule-view";
 
 interface ConfirmFormProps {
   place: LikedPlace;
   onToggleConfirmed: (place: LikedPlace) => void;
+  onAddEvent?: (event: Omit<ScheduleItem, "id" | "color">) => void;
 }
 
-export function ConfirmForm({ place, onToggleConfirmed }: ConfirmFormProps) {
+export function ConfirmForm({ place, onToggleConfirmed, onAddEvent }: ConfirmFormProps) {
   const form = useForm<z.infer<typeof ConfirmFormSchema>>({
     resolver: zodResolver(ConfirmFormSchema),
   });
 
   function onSubmit(data: z.infer<typeof ConfirmFormSchema>) {
+    // 확인(confirm) 처리
     toast.success("Confirmed!");
     onToggleConfirmed(place);
+
+    // 이벤트(스케줄) 추가
+    if (onAddEvent && data.startDate && data.endDate) {
+      const event: Omit<ScheduleItem, "id" | "color"> = {
+        title: place.name,
+        date: new Date(data.startDate),
+        startTime: new Date(data.startDate),
+        endTime: new Date(data.endDate),
+        type: place.type as "Food" | "Tour" | "Stay" | "Move" | "Etc",
+        description: place.address,
+        // placeId: place.id
+      };
+
+      onAddEvent(event);
+      toast.success("Added to schedule!");
+    }
+
     console.log(data);
   }
 
