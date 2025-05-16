@@ -17,6 +17,7 @@ interface ChatMessageCardProps {
 export const ChatMessageCard = ({ message }: ChatMessageCardProps) => {
   const accessToken = useAuthStore((s) => s.accessToken);
   const currentUserName = parseJwt(accessToken!).name;
+  const currentUserImageUrl = parseJwt(accessToken!).imageUrl;
   const sendAt = new Date(message.sendAt!);
 
   const [hovered, setHovered] = useState(false);
@@ -39,19 +40,27 @@ export const ChatMessageCard = ({ message }: ChatMessageCardProps) => {
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
         >
-          <AvatarFallback
-            className={
-              message.type === "ai"
-                ? "bg-secondary/30 text-secondary-foreground"
-                : "bg-accent/30 text-accent-foreground"
-            }
-          >
-            {message.type === "ai" ? (
-              <Bot className="h-4 w-4" />
-            ) : (
-              message.senderName!.charAt(0)
-            )}
-          </AvatarFallback>
+          {message.type === "chat" && currentUserImageUrl ? (
+            <AvatarImage
+              src={currentUserImageUrl}
+              alt="User Avatar"
+              className="h-8 w-8"
+            />
+          ) : (
+            <AvatarFallback
+              className={
+                message.type === "ai"
+                  ? "bg-secondary/30 text-secondary-foreground"
+                  : "bg-accent/30 text-accent-foreground"
+              }
+            >
+              {message.type === "ai" ? (
+                <Bot className="h-4 w-4" />
+              ) : (
+                message.senderName!.charAt(0)
+              )}
+            </AvatarFallback>
+          )}
         </Avatar>
         {hovered && (
           <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black px-2 py-1 rounded-md shadow text-xs text-white max-w-[100px] truncate">
