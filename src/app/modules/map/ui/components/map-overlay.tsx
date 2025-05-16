@@ -10,6 +10,7 @@ import {
 } from "@/app/modules/map/store/liked-place-store";
 import { useMapStore } from "@/app/modules/map/store/map-store";
 import { useApi } from "@/hooks/use-api";
+import { useWebSocketStore } from "@/app/modules/chat/store/websocket-store";
 
 type MapOverlayProps = {
   position: google.maps.LatLng;
@@ -35,6 +36,9 @@ export function MapOverlay({
   const liked = isLiked(placeInfo!.placeId);
   const map = useMapStore((state) => state.map);
   const googleMaps = useMapStore((state) => state.googleMaps);
+  const requestRefreshMap = useWebSocketStore(
+    (state) => state.requestRefreshMap
+  );
 
   const api = useApi();
 
@@ -103,6 +107,7 @@ export function MapOverlay({
 
       setMarker(placeInfo.placeId, marker);
     }
+    requestRefreshMap();
     onClose();
   };
 
