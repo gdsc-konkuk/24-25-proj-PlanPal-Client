@@ -1,11 +1,13 @@
 import { create } from "zustand";
+import { ChatMessage } from "../types";
 
 type WebSocketStore = {
   socket: WebSocket | null;
-  chatMessages: string[];
+  chatMessages: ChatMessage[];
   refreshMapTrigger: number;
   connect: (roomId: string, userName: string) => void;
   sendMessage: (type: "chat" | "ai", msg: string) => void;
+  addMessage: (message: ChatMessage) => void;
 };
 
 export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
@@ -26,15 +28,16 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
 
     socket.onmessage = (event) => {
       try {
-        const data = JSON.parse(event.data);
+        const data: ChatMessage = JSON.parse(event.data);
         switch (data.type) {
           case "chat":
+          case "ai":
             set((state) => ({
-              chatMessages: [...state.chatMessages, data.text],
+              chatMessages: [...state.chatMessages, data],
             }));
             break;
 
-          case "refreshMap":
+          case "refresh":
             set((state) => ({
               refreshMapTrigger: state.refreshMapTrigger + 1,
             }));
@@ -71,4 +74,7 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
       console.warn("WebSocket is not open.");
     }
   },
+
+  addMessage: (message) =>
+    set((state) => ({ chatMessages: [...state.chatMessages, message] })),
 }));
