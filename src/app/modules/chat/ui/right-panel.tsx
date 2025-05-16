@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { MessageSquare, Send, Info, InfoIcon } from "lucide-react";
+import { MessageSquare, Info, InfoIcon, BotIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChatMessage } from "../types";
@@ -86,12 +86,12 @@ export const RightPanel = ({
             disabled={!inputValue.trim()}
             className="bg-accent text-accent-foreground hover:bg-accent/90"
           >
-            <Send className="h-5 w-5" />
+            <BotIcon className="h-5 w-5" />
           </Button>
         </div>
         <div className="flex items-center mt-2 text-xs text-muted-foreground">
           <Info className="h-3 w-3 mr-1" />
-          <span>Try using #recommend to get AI suggestions</span>
+          <span>Press Enter to send a message, click the button to ask AI</span>
         </div>
       </div>
     </div>
