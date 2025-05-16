@@ -12,7 +12,14 @@ type WebSocketStore = {
 
 export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
   socket: null,
-  chatMessages: [],
+  chatMessages: [
+    {
+      type: "ai",
+      text: "Welcome to your group travel planning session! I'm your AI travel assistant. Tell me where you're thinking of going, and I can help with suggestions, cultural insights, and local recommendations. You can also invite friends to join this planning session!",
+      senderName: "ai",
+      sendAt: new Date().toISOString(),
+    },
+  ],
   refreshMapTrigger: 0,
 
   connect: (roomId, userName) => {
@@ -56,6 +63,12 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
     socket.onclose = () => {
       console.warn("WebSocket closed");
       set({ socket: null });
+      set((state) => ({
+        chatMessages: [
+          ...state.chatMessages,
+          { type: "ai", text: "WebSocket connection closed." },
+        ],
+      }));
     };
 
     set({ socket });

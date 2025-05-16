@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { MessageSquare, Send, Plus, Info } from "lucide-react";
+import { MessageSquare, Send, Info, InfoIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChatMessage } from "../types";
@@ -61,7 +61,7 @@ export const RightPanel = ({
                 key={index}
                 className="flex items-center justify-center text-sm text-muted-foreground"
               >
-                <Plus className="h-4 w-4 mr-1" />
+                <InfoIcon className="h-4 w-4 mr-1" />
                 {message.text}
               </div>
             )
