@@ -158,7 +158,7 @@ export function CreateChatModal({
       }
 
       // Call the API to create a chat room
-      const response = await api<ChatRoomResponse>("/chat-room", {
+      const response = await api<ChatRoomResponse>("/chat-rooms", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -339,7 +339,7 @@ export function CreateChatModal({
                     className={cn(
                       "border rounded-md p-2 flex flex-col items-center cursor-pointer hover:bg-accent/10",
                       coverImageType === "upload" &&
-                        "border-primary bg-accent/5"
+                      "border-primary bg-accent/5"
                     )}
                     onClick={() => setCoverImageType("upload")}
                   >
