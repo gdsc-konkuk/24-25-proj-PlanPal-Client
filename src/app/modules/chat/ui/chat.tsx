@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ResizableLayout } from "@/components/resizable-layout";
 import { useLikedPlaces } from "@/app/modules/map/store/liked-place-store";
-import { MessageType, ParticipantType, PlacesTabType, EventDataType, PlaceType } from "../types";
+import { MessageType, ParticipantType, PlacesTabType } from "../types";
 import { LeftPanel } from "./left-panel";
 import { MiddlePanel } from "./middle-panel";
 import { RightPanel } from "./right-panel";
@@ -12,7 +12,6 @@ import { ChatHeader } from "./components/chat-header";
 import type { ScheduleItem } from "@/components/weekly-schedule-view";
 import { useAuthStore } from "@/store/auth-store";
 import { parseJwt } from "@/lib/parseJwt";
-
 
 export default function Chat() {
   const searchParams = useSearchParams();
@@ -47,7 +46,8 @@ export default function Chat() {
   const [rightPanelVisible, setRightPanelVisible] = useState(true);
 
   const [activeLeftTab, setActiveLeftTab] = useState("map");
-  const [activePlacesTab, setActivePlacesTab] = useState<PlacesTabType>("confirmed");
+  const [activePlacesTab, setActivePlacesTab] =
+    useState<PlacesTabType>("confirmed");
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>([]);
 
   const likedPlaces = useLikedPlaces((state) => state.likedPlaces);
@@ -246,12 +246,12 @@ export default function Chat() {
         eventData.type === "식사"
           ? "#F59E0B"
           : eventData.type === "관광"
-            ? "#88C58F"
-            : eventData.type === "숙박"
-              ? "#60A5FA"
-              : eventData.type === "이동"
-                ? "#A78BFA"
-                : "#94A3B8",
+          ? "#88C58F"
+          : eventData.type === "숙박"
+          ? "#60A5FA"
+          : eventData.type === "이동"
+          ? "#A78BFA"
+          : "#94A3B8",
     };
 
     setScheduleItems((prev) => [...prev, newEvent]);

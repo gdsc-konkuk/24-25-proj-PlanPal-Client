@@ -10,6 +10,4 @@ export async function logoutRequest() {
   if (!res.ok) {
     throw new Error("Logout failed");
   }
-
-  // return res.json();
 }

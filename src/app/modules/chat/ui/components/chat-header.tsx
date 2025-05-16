@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import {
   ArrowLeft,

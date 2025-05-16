@@ -24,8 +24,6 @@ import {
   Camera,
   Ticket,
 } from "lucide-react";
-import { Logo } from "@/components/logo";
-import Link from "next/link";
 
 type LocalPlace = {
   id: string;
