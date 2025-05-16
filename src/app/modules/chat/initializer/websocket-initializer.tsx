@@ -12,7 +12,8 @@ interface WebSocketInitializerProps {
 export function WebSocketInitializer({ roomId }: WebSocketInitializerProps) {
   const connect = useWebSocketStore((s) => s.connect);
   const accessToken = useAuthStore((s) => s.accessToken);
-  const userName = encodeURIComponent(parseJwt(accessToken!).name);
+  if (!accessToken) return null;
+  const userName = encodeURIComponent(parseJwt(accessToken).name);
 
   useEffect(() => {
     connect(roomId, userName);

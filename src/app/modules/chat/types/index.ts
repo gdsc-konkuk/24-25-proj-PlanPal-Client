@@ -48,7 +48,7 @@ export interface ChatRoomResponse {
 }
 
 export interface ChatMessage {
-  type: "chat" | "ai" | "refresh";
+  type: "chat" | "aiRequest" | "aiResponse" | "refreshMap" | "refreshSchedule";
   senderName?: string;
   text?: string;
   sendAt?: string;

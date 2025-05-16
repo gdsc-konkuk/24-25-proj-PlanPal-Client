@@ -39,7 +39,6 @@ export default function Chat() {
   const chatMessages = useWebSocketStore((state) => state.chatMessages);
   const addMessage = useWebSocketStore((state) => state.addMessage);
   const [isComposing, setIsComposing] = useState(false);
-  console.log(chatMessages);
 
   // 패널 가시성 변경 핸들러 - 이 함수는 ResizableLayout에서만 호출되도록 수정
   const handlePanelVisibilityChange = (

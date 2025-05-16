@@ -16,6 +16,7 @@ interface ChatMessageCardProps {
 
 export const ChatMessageCard = ({ message }: ChatMessageCardProps) => {
   const accessToken = useAuthStore((s) => s.accessToken);
+  if (!accessToken) return null;
   const currentUserName = parseJwt(accessToken!).name;
   const currentUserImageUrl = parseJwt(accessToken!).imageUrl;
   const sendAt = new Date(message.sendAt!);
@@ -49,12 +50,12 @@ export const ChatMessageCard = ({ message }: ChatMessageCardProps) => {
           ) : (
             <AvatarFallback
               className={
-                message.type === "ai"
+                message.type === "aiResponse"
                   ? "bg-secondary/30 text-secondary-foreground"
                   : "bg-accent/30 text-accent-foreground"
               }
             >
-              {message.type === "ai" ? (
+              {message.type === "aiResponse" ? (
                 <Bot className="h-4 w-4" />
               ) : (
                 message.senderName!.charAt(0)
@@ -68,14 +69,18 @@ export const ChatMessageCard = ({ message }: ChatMessageCardProps) => {
           </div>
         )}
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs text-foreground/50">
-              {format(sendAt, "HH:mm")}
-            </span>
-          </div>
+          {sendAt && (
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xs text-foreground/50">
+                {format(sendAt, "HH:mm")}
+              </span>
+            </div>
+          )}
           <Card
             className={`${
-              message.type === "ai" ? "bg-secondary/20 border-secondary/30" : ""
+              message.type === "aiResponse"
+                ? "bg-secondary/20 border-secondary/30"
+                : ""
             }`}
           >
             <CardContent className="p-3 text-sm">{message.text}</CardContent>
