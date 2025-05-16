@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ResizableLayout } from "@/components/resizable-layout";
 import { useLikedPlaces } from "@/app/modules/map/store/liked-place-store";
-import { MessageType, ParticipantType, PlacesTabType, EventDataType, PlaceType } from "../types";
+import { MessageType, ParticipantType, PlacesTabType } from "../types";
 import { LeftPanel } from "./left-panel";
 import { MiddlePanel } from "./middle-panel";
 import { RightPanel } from "./right-panel";
@@ -12,7 +12,8 @@ import { ChatHeader } from "./components/chat-header";
 import type { ScheduleItem } from "@/components/weekly-schedule-view";
 import { useAuthStore } from "@/store/auth-store";
 import { parseJwt } from "@/lib/parseJwt";
-
+import { WebSocketInitializer } from "../initializer/websocket-initializer";
+import { useWebSocketStore } from "../store/websocket-store";
 
 export default function Chat() {
   const searchParams = useSearchParams();
@@ -47,10 +48,14 @@ export default function Chat() {
   const [rightPanelVisible, setRightPanelVisible] = useState(true);
 
   const [activeLeftTab, setActiveLeftTab] = useState("map");
-  const [activePlacesTab, setActivePlacesTab] = useState<PlacesTabType>("confirmed");
+  const [activePlacesTab, setActivePlacesTab] =
+    useState<PlacesTabType>("confirmed");
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>([]);
 
   const likedPlaces = useLikedPlaces((state) => state.likedPlaces);
+
+  const sendMessage = useWebSocketStore((state) => state.sendMessage);
+  const [isComposing, setIsComposing] = useState(false);
 
   // 패널 가시성 변경 핸들러 - 이 함수는 ResizableLayout에서만 호출되도록 수정
   const handlePanelVisibilityChange = (
@@ -110,6 +115,8 @@ export default function Chat() {
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
+
+    sendMessage("chat", inputValue);
 
     // Add user message
     const userMessage: MessageType = {
@@ -220,7 +227,7 @@ export default function Chat() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !isComposing) {
       e.preventDefault();
       handleSendMessage();
     }
@@ -246,12 +253,12 @@ export default function Chat() {
         eventData.type === "식사"
           ? "#F59E0B"
           : eventData.type === "관광"
-            ? "#88C58F"
-            : eventData.type === "숙박"
-              ? "#60A5FA"
-              : eventData.type === "이동"
-                ? "#A78BFA"
-                : "#94A3B8",
+          ? "#88C58F"
+          : eventData.type === "숙박"
+          ? "#60A5FA"
+          : eventData.type === "이동"
+          ? "#A78BFA"
+          : "#94A3B8",
     };
 
     setScheduleItems((prev) => [...prev, newEvent]);
@@ -259,6 +266,7 @@ export default function Chat() {
 
   return (
     <div className="flex h-screen bg-muted/30 overflow-hidden">
+      <WebSocketInitializer roomId={travelId!} />
       {/* Header */}
       <ChatHeader
         travelId={travelId}
@@ -299,6 +307,7 @@ export default function Chat() {
               onKeyDown={handleKeyDown}
               onToggleConfirmed={toggleConfirmed}
               onToggleFavorite={toggleFavorite}
+              onSetIsComposing={(value) => setIsComposing(value)}
             />
           }
           leftVisible={leftPanelVisible}

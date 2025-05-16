@@ -1,4 +1,3 @@
-import { parseJwt } from "@/lib/parseJwt";
 import { create } from "zustand";
 
 interface AuthState {

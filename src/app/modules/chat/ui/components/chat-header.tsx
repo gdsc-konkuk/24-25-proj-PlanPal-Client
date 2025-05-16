@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -12,13 +11,12 @@ import {
   EyeIcon,
   EyeOffIcon,
   Clipboard,
-  LinkIcon,
 } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { parseJwt } from "@/lib/parseJwt";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
-import { getChatRoomInviteCode } from "../../api/chat-room";
+import { useApi } from "@/hooks/use-api";
 
 interface ChatHeaderProps {
   travelId: string | null;
@@ -43,39 +41,46 @@ export function ChatHeader({
   const [inviteCode, setInviteCode] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const api = useApi();
+
   // Fetch invite code when travelId changes
   useEffect(() => {
-    if (travelId) {
-      setIsLoading(true);
-      const chatRoomId = parseInt(travelId, 10);
+    const fetchInviteCode = async () => {
+      if (travelId) {
+        setIsLoading(true);
+        const chatRoomId = parseInt(travelId, 10);
 
-      if (!isNaN(chatRoomId)) {
-        getChatRoomInviteCode(chatRoomId)
-          .then(response => {
+        if (!isNaN(chatRoomId)) {
+          try {
+            const response = await api<{ inviteCode: string }>(
+              `/chat-rooms/${chatRoomId}/invite`
+            );
             setInviteCode(response.inviteCode);
-          })
-          .catch(error => {
+          } catch (error) {
             console.error("Failed to fetch invite code:", error);
             toast.error("Failed to load invite code");
-          })
-          .finally(() => {
+          } finally {
             setIsLoading(false);
-          });
+          }
+        }
       }
-    }
+    };
+    fetchInviteCode();
   }, [travelId]);
 
   // 패널 가시성 상태 계산
   const visiblePanelCount = [
     leftPanelVisible,
     middlePanelVisible,
-    rightPanelVisible
+    rightPanelVisible,
   ].filter(Boolean).length;
 
   // 사용자 정보
   const accessToken = useAuthStore((state) => state.accessToken);
   const currentUser = accessToken ? parseJwt(accessToken).name : "User";
-  const userImage = accessToken ? parseJwt(accessToken).imageUrl : "/placeholder.svg";
+  const userImage = accessToken
+    ? parseJwt(accessToken).imageUrl
+    : "/placeholder.svg";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-10 bg-background border-b border-primary/10 h-14 flex items-center px-4">
@@ -107,19 +112,18 @@ export function ChatHeader({
                 const inviteLink = `${window.location.origin}/dashboard/invite?code=${inviteCode}`;
 
                 // Copy to clipboard
-                navigator.clipboard.writeText(inviteLink)
+                navigator.clipboard
+                  .writeText(inviteLink)
                   .then(() => {
                     // Show toast notification
-                    toast.success('Invitation link copied to clipboard!');
+                    toast.success("Invitation link copied to clipboard!");
                   })
-                  .catch(err => {
-                    console.error('Failed to copy: ', err);
-                    toast.error('Failed to copy link');
+                  .catch((err) => {
+                    console.error("Failed to copy: ", err);
+                    toast.error("Failed to copy link");
                   });
               }}
             >
-              <span className="text-sm font-medium">Copy invite code:</span>
-              <span className="truncate max-w-[100px]">{isLoading ? "Loading..." : inviteCode}</span>
               <Clipboard className="h-4 w-4" />
             </Button>
           </div>
@@ -169,15 +173,7 @@ export function ChatHeader({
             <EyeOffIcon className="h-3 w-3" />
           )}
         </Button>
-        <Avatar className="h-8 w-8">
-          <AvatarImage src={userImage} alt="User Avatar" />
-          <AvatarFallback>
-            {currentUser.charAt(0).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
-        {/* <Button className="h-8 w-fit">
-          {currentUser}
-        </Button> */}
+        <Button className="h-8 w-fit">{currentUser}</Button>
       </div>
     </header>
   );

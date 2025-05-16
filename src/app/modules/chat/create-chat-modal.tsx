@@ -13,7 +13,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import {
   Calendar,
   Copy,
@@ -28,9 +27,10 @@ import type { DateRange } from "react-day-picker";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { createChatRoom } from "@/app/modules/chat/api/chat-room";
 import { cn } from "@/lib/utils";
 import { PlaceAutocomplete } from "@/app/modules/chat/place-autocomplete";
+import { useApi } from "@/hooks/use-api";
+import { ChatRoomResponse } from "./types";
 
 type Destination = {
   id: string;
@@ -46,7 +46,11 @@ interface CreateChatModalProps {
   onTravelCreated: (travelId: string) => void;
 }
 
-export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: CreateChatModalProps) {
+export function CreateChatModal({
+  isOpen,
+  onOpenChange,
+  onTravelCreated,
+}: CreateChatModalProps) {
   const router = useRouter();
 
   // Form state
@@ -84,11 +88,17 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
     setActiveTab("basic");
     setCoverImageType("ai");
     setUploadMethod("file");
-    setImageUrl("https://images.unsplash.com/photo-1504107435030-c7cd582601b8?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+    setImageUrl(
+      "https://images.unsplash.com/photo-1504107435030-c7cd582601b8?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    );
     setPreviewImage("");
-    setCoverImageUrl("https://images.unsplash.com/photo-1504107435030-c7cd582601b8?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+    setCoverImageUrl(
+      "https://images.unsplash.com/photo-1504107435030-c7cd582601b8?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    );
     setNewTravelId(null);
   };
+
+  const api = useApi();
 
   // Reset form when dialog closes
   useEffect(() => {
@@ -109,23 +119,29 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
           // 목적지가 하나인 경우, 해당 좌표 사용
           coordinates = {
             lat: destinations[0].lat,
-            lng: destinations[0].lng
+            lng: destinations[0].lng,
           };
         } else {
           // 목적지가 여러 개인 경우, 중심점 계산
-          const totalLat = destinations.reduce((sum, dest) => sum + dest.lat, 0);
-          const totalLng = destinations.reduce((sum, dest) => sum + dest.lng, 0);
+          const totalLat = destinations.reduce(
+            (sum, dest) => sum + dest.lat,
+            0
+          );
+          const totalLng = destinations.reduce(
+            (sum, dest) => sum + dest.lng,
+            0
+          );
           coordinates = {
             lat: totalLat / destinations.length,
-            lng: totalLng / destinations.length
+            lng: totalLng / destinations.length,
           };
         }
       }
 
       // 목적지 이름 문자열 생성
-      const destinationString = destinations.map(dest =>
-        `${dest.name} (${dest.address})`
-      ).join(", ");
+      const destinationString = destinations
+        .map((dest) => `${dest.name} (${dest.address})`)
+        .join(", ");
 
       // Create request payload from form data
       const chatRoomData = {
@@ -142,7 +158,13 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
       }
 
       // Call the API to create a chat room
-      const response = await createChatRoom(chatRoomData);
+      const response = await api<ChatRoomResponse>("/chat-room", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(chatRoomData),
+      });
 
       // Generate an invite link using the inviteCode from the response
       const baseUrl = window.location.origin;
@@ -169,14 +191,19 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
     setTimeout(() => setLinkCopied(false), 2000);
   };
 
-  const handlePlaceSelect = (place: { name: string; address: string; lat: number; lng: number }) => {
+  const handlePlaceSelect = (place: {
+    name: string;
+    address: string;
+    lat: number;
+    lng: number;
+  }) => {
     if (place.name && place.lat && place.lng) {
       setSelectedPlace({
         id: `dest-${Date.now()}`,
         name: place.name,
         address: place.address,
         lat: place.lat,
-        lng: place.lng
+        lng: place.lng,
       });
     } else {
       setSelectedPlace(null);
@@ -185,7 +212,7 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
 
   const addDestination = () => {
     if (selectedPlace) {
-      setDestinations(prev => [...prev, selectedPlace]);
+      setDestinations((prev) => [...prev, selectedPlace]);
       setSelectedPlace(null);
     }
   };
@@ -237,7 +264,11 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="basic" value={activeTab} onValueChange={setActiveTab}>
+        <Tabs
+          defaultValue="basic"
+          value={activeTab}
+          onValueChange={setActiveTab}
+        >
           <TabsList className="grid grid-cols-3 mb-4">
             <TabsTrigger value="basic">Basic Info</TabsTrigger>
             <TabsTrigger value="destination">Destination</TabsTrigger>
@@ -263,7 +294,9 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
                 min="1"
                 max="100"
                 value={newTravelParticipants}
-                onChange={(e) => setNewTravelParticipants(parseInt(e.target.value))}
+                onChange={(e) =>
+                  setNewTravelParticipants(parseInt(e.target.value))
+                }
               />
             </div>
 
@@ -305,7 +338,8 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
                   <div
                     className={cn(
                       "border rounded-md p-2 flex flex-col items-center cursor-pointer hover:bg-accent/10",
-                      coverImageType === "upload" && "border-primary bg-accent/5"
+                      coverImageType === "upload" &&
+                        "border-primary bg-accent/5"
                     )}
                     onClick={() => setCoverImageType("upload")}
                   >
@@ -479,7 +513,8 @@ export function CreateChatModal({ isOpen, onOpenChange, onTravelCreated }: Creat
                   </div>
                   <h3 className="text-xl font-bold">Trip Created!</h3>
                   <p className="text-muted-foreground">
-                    Share this link with your friends to invite them to your trip
+                    Share this link with your friends to invite them to your
+                    trip
                   </p>
 
                   <div className="flex mt-4">
