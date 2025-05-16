@@ -14,6 +14,7 @@ interface LeftPanelProps {
   scheduleItems: ScheduleItem[];
   places: LikedPlace[];
   onAddEvent: (eventData: Omit<ScheduleItem, "id" | "color">) => void;
+  chatRoomId: string; // Add chatRoomId prop
 }
 
 export const LeftPanel = ({
@@ -22,6 +23,7 @@ export const LeftPanel = ({
   scheduleItems,
   places,
   onAddEvent,
+  chatRoomId,
 }: LeftPanelProps) => {
   return (
     <Tabs
@@ -63,6 +65,7 @@ export const LeftPanel = ({
             scheduleItems={scheduleItems}
             places={places}
             onAddEvent={onAddEvent}
+            chatRoomId={chatRoomId} // Pass chatRoomId
           />
         </div>
       </div>

@@ -37,6 +37,7 @@ interface WeeklyScheduleViewProps {
   scheduleItems: ScheduleItem[];
   places: LikedPlace[];
   onAddEvent: (event: Omit<ScheduleItem, "id" | "color">) => void;
+  chatRoomId: string; // Add chatRoomId prop
 }
 
 // 시간 간격 (30분 단위)
@@ -59,6 +60,7 @@ export function WeeklyScheduleView({
   scheduleItems,
   places,
   onAddEvent,
+  chatRoomId,
 }: WeeklyScheduleViewProps) {
   const [weekStart, setWeekStart] = useState<Date>(
     startOfWeek(new Date(), { weekStartsOn: 1 })
@@ -262,6 +264,7 @@ export function WeeklyScheduleView({
           <DialogTitle>Add New Schedule</DialogTitle>
           <AddEventForm
             selectedDate={selectedDate}
+            chatRoomId={chatRoomId} // Pass chatRoomId
             onAddEvent={handleAddEvent}
             onCancel={() => setShowAddEventDialog(false)}
           />

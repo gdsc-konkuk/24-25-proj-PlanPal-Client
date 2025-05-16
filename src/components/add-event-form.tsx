@@ -12,6 +12,9 @@ import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { useApi } from "@/hooks/use-api"
+import { toast } from "sonner"
+import { useWebSocketStore } from "@/app/modules/chat/store/websocket-store"
 
 type EventType = "Food" | "Tour" | "Stay" | "Move" | "Etc"
 
@@ -35,6 +38,7 @@ const getRandomColor = (): string => {
 
 interface AddEventFormProps {
   selectedDate: Date
+  chatRoomId: string // Add chatRoomId prop
   onAddEvent: (event: {
     title: string
     date: Date
@@ -43,7 +47,7 @@ interface AddEventFormProps {
     type: EventType
     description?: string
     placeId?: string
-    color: string // Add color property to the event interface
+    color: string
   }) => void
   onCancel: () => void
 }
@@ -60,9 +64,12 @@ const eventFormSchema = z.object({
   }),
 })
 
-export function AddEventForm({ selectedDate, onAddEvent, onCancel }: AddEventFormProps) {
+export function AddEventForm({ selectedDate, chatRoomId, onAddEvent, onCancel }: AddEventFormProps) {
   const likedPlaces = useLikedPlaces((state) => state.likedPlaces)
   const [open, setOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const api = useApi()
+  const refreshScheduleTrigger = useWebSocketStore((state) => state.refreshScheduleTrigger)
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
@@ -106,7 +113,7 @@ export function AddEventForm({ selectedDate, onAddEvent, onCancel }: AddEventFor
     form.setValue(field, newDate);
   }
 
-  function onSubmit(data: z.infer<typeof eventFormSchema>) {
+  async function onSubmit(data: z.infer<typeof eventFormSchema>) {
     // Find the selected place details
     const selectedPlace = likedPlaces.find(place => place.placeId === data.placeId)
 
@@ -115,15 +122,52 @@ export function AddEventForm({ selectedDate, onAddEvent, onCancel }: AddEventFor
     // Generate a random color for the event
     const eventColor = getRandomColor();
 
-    onAddEvent({
-      title: selectedPlace.name,
-      date: data.startDate,
-      startTime: data.startDate,
-      endTime: data.endDate,
-      type: (selectedPlace.type as EventType) || "Tour",
-      placeId: selectedPlace.placeId,
-      color: eventColor // Add the random color
-    })
+    try {
+      setIsSubmitting(true)
+
+      // Prepare API request payload
+      const requestBody = {
+        title: selectedPlace.name,
+        address: selectedPlace.address,
+        content: selectedPlace.content,
+        type: selectedPlace.type || "Tour",
+        rating: selectedPlace.rating,
+        iconType: selectedPlace.iconType,
+        placeId: selectedPlace.placeId,
+        schedule: {
+          startTime: data.startDate.toISOString(),
+          endTime: data.endDate.toISOString()
+        }
+      }
+
+      // Make API request to add pin with schedule
+      await api(`/maps/${chatRoomId}/pins`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      })
+
+      // If API call is successful, add event to calendar
+      onAddEvent({
+        title: selectedPlace.name,
+        date: data.startDate,
+        startTime: data.startDate,
+        endTime: data.endDate,
+        type: (selectedPlace.type as EventType) || "Tour",
+        placeId: selectedPlace.placeId,
+        color: eventColor
+      })
+
+      toast.success("Event added to calendar")
+      onCancel() // Close the form
+    } catch (error) {
+      console.error("Failed to add event:", error)
+      toast.error("Failed to add event to calendar")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -408,10 +452,12 @@ export function AddEventForm({ selectedDate, onAddEvent, onCancel }: AddEventFor
         />
 
         <div className="flex justify-end space-x-2 pt-2">
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="submit">Add Event</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Adding..." : "Add Event"}
+          </Button>
         </div>
       </form>
     </Form>

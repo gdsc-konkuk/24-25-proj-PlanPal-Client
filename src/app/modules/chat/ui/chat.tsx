@@ -124,12 +124,12 @@ export default function Chat() {
         eventData.type === "Food"
           ? "#F59E0B"
           : eventData.type === "Tour"
-          ? "#88C58F"
-          : eventData.type === "Stay"
-          ? "#60A5FA"
-          : eventData.type === "Move"
-          ? "#A78BFA"
-          : "#94A3B8",
+            ? "#88C58F"
+            : eventData.type === "Stay"
+              ? "#60A5FA"
+              : eventData.type === "Move"
+                ? "#A78BFA"
+                : "#94A3B8",
     };
 
     setScheduleItems((prev) => [...prev, newEvent]);
@@ -152,9 +152,8 @@ export default function Chat() {
       {/* Main Content with Resizable Layout */}
       <div className="w-full mt-14">
         <ResizableLayout
-          key={`panels-${leftPanelVisible ? 1 : 0}-${
-            middlePanelVisible ? 1 : 0
-          }-${rightPanelVisible ? 1 : 0}`}
+          key={`panels-${leftPanelVisible ? 1 : 0}-${middlePanelVisible ? 1 : 0
+            }-${rightPanelVisible ? 1 : 0}`}
           leftContent={
             <LeftPanel
               activeTab={activeLeftTab}
@@ -162,6 +161,7 @@ export default function Chat() {
               scheduleItems={scheduleItems}
               places={likedPlaces}
               onAddEvent={handleAddEvent}
+              chatRoomId={travelId || ""} // Pass travelId as chatRoomId
             />
           }
           middleContent={
