@@ -1,15 +1,35 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Filter, Star, StarOff, Hash, CalendarPlus2Icon as CalendarIcon2 } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Star,
+  StarOff,
+  Hash,
+  CalendarPlus2Icon as CalendarIcon2,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { LikedPlace, IconType } from "@/app/modules/map/store/liked-place-store";
+import {
+  LikedPlace,
+  IconType,
+} from "@/app/modules/map/store/liked-place-store";
 import { PlaceDialog } from "./components/place-dialog";
 import { PlacesTabType } from "../types";
 
@@ -22,7 +42,7 @@ interface MiddlePanelProps {
 export const MiddlePanel = ({
   likedPlaces,
   activePlacesTab,
-  onActivePlacesTabChange
+  onActivePlacesTabChange,
 }: MiddlePanelProps) => {
   const [placeFilter, setPlaceFilter] = useState<string>("all");
   const [timeFilter, setTimeFilter] = useState<string>("all");

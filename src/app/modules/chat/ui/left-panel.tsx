@@ -1,7 +1,7 @@
 "use client";
 
 import { Map, CalendarIcon } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { GoogleMap } from "@/app/modules/map/ui/components/google-map";
 import { WeeklyScheduleView } from "@/components/weekly-schedule-view";
@@ -21,7 +21,7 @@ export const LeftPanel = ({
   onTabChange,
   scheduleItems,
   places,
-  onAddEvent
+  onAddEvent,
 }: LeftPanelProps) => {
   return (
     <Tabs

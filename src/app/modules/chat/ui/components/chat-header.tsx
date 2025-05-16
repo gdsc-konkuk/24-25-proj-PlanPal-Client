@@ -11,7 +11,6 @@ import {
   EyeIcon,
   EyeOffIcon,
   Clipboard,
-  LinkIcon,
 } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { parseJwt } from "@/lib/parseJwt";
