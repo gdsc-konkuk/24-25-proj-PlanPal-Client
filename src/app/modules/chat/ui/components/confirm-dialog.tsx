@@ -28,10 +28,10 @@ export function ConfirmDialog({ place }: PlaceCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const refreshScheduleTrigger = useWebSocketStore((state) => state.refreshScheduleTrigger);
 
-  const deleteSchedulesByPlaceId = async (placeId: string) => {
+  const deleteSchedulesByPlaceId = async (name: string) => {
     // Find all schedules associated with this place
     const matchingSchedules = schedules.filter(
-      (schedule) => schedule.placeId === placeId
+      (schedule) => schedule.title === name
     );
 
     if (matchingSchedules.length === 0) {
@@ -75,7 +75,7 @@ export function ConfirmDialog({ place }: PlaceCardProps) {
 
     // If we're removing a confirmed place, delete its schedules first
     if (isConfirmed) {
-      await deleteSchedulesByPlaceId(placeId);
+      await deleteSchedulesByPlaceId(place.name);
     }
 
     setIconType(placeId, isConfirmed ? IconType.HEART : IconType.STAR);
