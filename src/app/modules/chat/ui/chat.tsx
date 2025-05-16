@@ -1,23 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ResizableLayout } from "@/components/resizable-layout";
-import { IconType, useLikedPlaces } from "@/app/modules/map/store/liked-place-store";
-import { useMapStore } from "@/app/modules/map/store/map-store";
-import { useApi } from "@/hooks/use-api";
+import { useLikedPlaces } from "@/app/modules/map/store/liked-place-store";
 import { MessageType, ParticipantType, PlacesTabType, EventDataType, PlaceType } from "../types";
 import { LeftPanel } from "./left-panel";
 import { MiddlePanel } from "./middle-panel";
 import { RightPanel } from "./right-panel";
 import { ChatHeader } from "./components/chat-header";
 import type { ScheduleItem } from "@/components/weekly-schedule-view";
+import { useAuthStore } from "@/store/auth-store";
+import { parseJwt } from "@/lib/parseJwt";
 
 
 export default function Chat() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const travelId = searchParams.get("id");
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const currentUser = accessToken ? parseJwt(accessToken).name : "User";
 
   // State variables
   const [messages, setMessages] = useState<MessageType[]>([
@@ -25,7 +26,7 @@ export default function Chat() {
       id: "1",
       sender: {
         id: "ai",
-        name: "Travel AI",
+        name: "PlanPal AI",
       },
       content:
         "Welcome to your group travel planning session! I'm your AI travel assistant. Tell me where you're thinking of going, and I can help with suggestions, cultural insights, and local recommendations. You can also invite friends to join this planning session!",
@@ -34,12 +35,11 @@ export default function Chat() {
     },
   ]);
   const [participants, setParticipants] = useState<ParticipantType[]>([
-    { id: "user1", name: "You", isAI: false, isOnline: true },
-    { id: "ai", name: "Travel AI", isAI: true, isOnline: true },
+    { id: "user1", name: currentUser, isAI: false, isOnline: true },
+    { id: "ai", name: "PlanPal AI", isAI: true, isOnline: true },
   ]);
   const [inputValue, setInputValue] = useState("");
   const [destination, setDestination] = useState("");
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   // 패널 가시성 상태
   const [leftPanelVisible, setLeftPanelVisible] = useState(true);
@@ -50,13 +50,7 @@ export default function Chat() {
   const [activePlacesTab, setActivePlacesTab] = useState<PlacesTabType>("confirmed");
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>([]);
 
-  const map = useMapStore((state) => state.map);
   const likedPlaces = useLikedPlaces((state) => state.likedPlaces);
-  const setIconType = useLikedPlaces((state) => state.setIconType);
-  const getIconType = useLikedPlaces((state) => state.getIconType);
-  const getMarker = useLikedPlaces((state) => state.getMarker);
-
-  const api = useApi();
 
   // 패널 가시성 변경 핸들러 - 이 함수는 ResizableLayout에서만 호출되도록 수정
   const handlePanelVisibilityChange = (
@@ -122,7 +116,7 @@ export default function Chat() {
       id: Date.now().toString(),
       sender: {
         id: "user1",
-        name: "You",
+        name: currentUser,
       },
       content: inputValue,
       timestamp: new Date(),
@@ -185,7 +179,7 @@ export default function Chat() {
         id: (Date.now() + 1).toString(),
         sender: {
           id: "ai",
-          name: "Travel AI",
+          name: "PlanPal AI",
         },
         content: aiResponse,
         timestamp: new Date(),

@@ -52,7 +52,7 @@ export function ChatHeader({
       if (!isNaN(chatRoomId)) {
         getChatRoomInviteCode(chatRoomId)
           .then(response => {
-            setInviteCode(response);
+            setInviteCode(response.inviteCode);
           })
           .catch(error => {
             console.error("Failed to fetch invite code:", error);
@@ -75,6 +75,7 @@ export function ChatHeader({
   // 사용자 정보
   const accessToken = useAuthStore((state) => state.accessToken);
   const currentUser = accessToken ? parseJwt(accessToken).name : "User";
+  const userImage = accessToken ? parseJwt(accessToken).imageUrl : "/placeholder.svg";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-10 bg-background border-b border-primary/10 h-14 flex items-center px-4">
@@ -95,8 +96,7 @@ export function ChatHeader({
 
         {travelId && inviteCode && (
           <div className="flex items-center ml-2">
-            <LinkIcon className="h-4 w-4 text-foreground/70 mr-2 shrink-0" />
-            <span className="text-sm font-medium">Invite Code:</span>
+            {/* <LinkIcon className="h-4 w-4 text-foreground/70 mr-2 shrink-0" /> */}
             <Button
               variant="outline"
               size="sm"
@@ -118,6 +118,7 @@ export function ChatHeader({
                   });
               }}
             >
+              <span className="text-sm font-medium">Copy invite code:</span>
               <span className="truncate max-w-[100px]">{isLoading ? "Loading..." : inviteCode}</span>
               <Clipboard className="h-4 w-4" />
             </Button>
@@ -135,9 +136,9 @@ export function ChatHeader({
         >
           <MapIcon className="h-4 w-4" />
           {leftPanelVisible ? (
-            <EyeOffIcon className="h-3 w-3" />
-          ) : (
             <EyeIcon className="h-3 w-3" />
+          ) : (
+            <EyeOffIcon className="h-3 w-3" />
           )}
         </Button>
         <Button
@@ -149,9 +150,9 @@ export function ChatHeader({
         >
           <ListIcon className="h-4 w-4" />
           {middlePanelVisible ? (
-            <EyeOffIcon className="h-3 w-3" />
-          ) : (
             <EyeIcon className="h-3 w-3" />
+          ) : (
+            <EyeOffIcon className="h-3 w-3" />
           )}
         </Button>
         <Button
@@ -163,14 +164,20 @@ export function ChatHeader({
         >
           <MessageCircleIcon className="h-4 w-4" />
           {rightPanelVisible ? (
-            <EyeOffIcon className="h-3 w-3" />
-          ) : (
             <EyeIcon className="h-3 w-3" />
+          ) : (
+            <EyeOffIcon className="h-3 w-3" />
           )}
         </Button>
-        <Button className="h-8 w-fit">
+        <Avatar className="h-8 w-8">
+          <AvatarImage src={userImage} alt="User Avatar" />
+          <AvatarFallback>
+            {currentUser.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        {/* <Button className="h-8 w-fit">
           {currentUser}
-        </Button>
+        </Button> */}
       </div>
     </header>
   );
