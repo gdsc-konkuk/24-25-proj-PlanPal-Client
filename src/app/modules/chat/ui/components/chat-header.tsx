@@ -125,6 +125,7 @@ export function ChatHeader({
               }}
             >
               <Clipboard className="h-4 w-4" />
+              Click to Invite
             </Button>
           </div>
         )}
