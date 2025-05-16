@@ -68,11 +68,13 @@ export const ChatMessageCard = ({ message }: ChatMessageCardProps) => {
           </div>
         )}
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs text-foreground/50">
-              {format(sendAt, "HH:mm")}
-            </span>
-          </div>
+          {sendAt && (
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xs text-foreground/50">
+                {format(sendAt, "HH:mm")}
+              </span>
+            </div>
+          )}
           <Card
             className={`${
               message.type === "aiResponse"
