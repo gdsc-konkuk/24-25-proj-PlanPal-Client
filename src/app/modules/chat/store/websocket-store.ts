@@ -9,6 +9,7 @@ type WebSocketStore = {
   connect: (roomId: string, userName: string) => void;
   sendMessage: (type: "chat" | "aiRequest", msg: string) => void;
   addMessage: (message: ChatMessage) => void;
+  requestRefreshMap: () => void;
 };
 
 export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
@@ -99,4 +100,17 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
 
   addMessage: (message) =>
     set((state) => ({ chatMessages: [...state.chatMessages, message] })),
+
+  requestRefreshMap: () => {
+    const socket = get().socket;
+    if (socket?.readyState === WebSocket.OPEN) {
+      socket.send(
+        JSON.stringify({
+          type: "refreshMap",
+        })
+      );
+    } else {
+      console.warn("WebSocket is not open.");
+    }
+  },
 }));
