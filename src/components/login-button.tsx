@@ -6,7 +6,7 @@ import { useAuthStore } from "@/store/auth-store";
 import { logoutRequest } from "@/app/modules/auth/api/logout";
 import { parseJwt } from "@/lib/parseJwt";
 import { useState } from "react";
-import { Avatar, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { LogOutIcon } from "lucide-react";
 
 interface LoginButtonProps {
@@ -32,12 +32,15 @@ export function LoginButton({ setShowLoginModal }: LoginButtonProps) {
   };
 
   return accessToken ? (
-    <button
+    <div
       onClick={() => setShowUserMenu(!showUserMenu)}
-      className="relative w-fit h-fit flex items-center justify-center border-2 rounded-full hover:bg-accent/10"
+      className="relative w-fit h-fit flex items-center justify-center border-2 rounded-full hover:bg-accent/10 cursor-pointer select-none"
     >
       <Avatar className="relative w-10 h-10 rounded-full">
-        <AvatarImage src={userImage} alt={userEmail} />
+        <AvatarImage src={userImage} alt="user avatar image" />
+        <AvatarFallback className="bg-muted flex items-center justify-center rounded-full">
+          {currentUser.charAt(0).toUpperCase()}
+        </AvatarFallback>
       </Avatar>
 
       {showUserMenu && (
@@ -63,14 +66,14 @@ export function LoginButton({ setShowLoginModal }: LoginButtonProps) {
           </button>
         </div>
       )}
-    </button>
+    </div>
   ) : (
     <Button
       variant="outline"
       className="md:inline-flex"
       onClick={accessToken ? handleLogout : handleLogin}
     >
-      {accessToken ? currentUser : "Log in"}
+      {accessToken ? currentUser : "Login"}
     </Button>
   );
 }
