@@ -9,7 +9,7 @@ export function ReviewList({ reviews }: Props) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
   return (
-    <div className="grid gap-4 overflow-scroll max-h-96">
+    <div className="grid gap-4 overflow-y-scroll max-h-96">
       {reviews.map((review, i) => {
         const isExpanded = expandedIndex === i;
 
@@ -56,11 +56,10 @@ export function ReviewList({ reviews }: Props) {
                 )}
 
                 <div
-                  className={`text-sm text-gray-700 whitespace-pre-line transition-all duration-300 ${
-                    isExpanded
+                  className={`text-sm text-gray-700 whitespace-pre-line transition-all duration-300 ${isExpanded
                       ? "max-h-48 overflow-y-auto pr-1"
                       : "line-clamp-3"
-                  }`}
+                    }`}
                 >
                   {review.text}
                 </div>

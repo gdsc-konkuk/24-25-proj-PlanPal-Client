@@ -162,7 +162,7 @@ export const MiddlePanel = ({
                   key={`place-dialog-${place.placeId}-${i}`}
                   place={place}
                   activePlacesTab={activePlacesTab}
-                  // onAddEvent={onAddEvent}
+                // onAddEvent={onAddEvent}
                 />
               ))}
             </div>

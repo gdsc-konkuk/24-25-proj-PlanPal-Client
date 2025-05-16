@@ -27,6 +27,7 @@ import { useForm, UseFormReturn } from "react-hook-form";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { LikedPlace } from "@/app/modules/map/store/liked-place-store";
 import type { ScheduleItem } from "@/components/weekly-schedule-view";
+import { fetchAuth } from "@/lib/fetch-auth";
 
 interface ConfirmFormProps {
   place: LikedPlace;
@@ -39,7 +40,7 @@ export function ConfirmForm({ place, onToggleConfirmed, onAddEvent }: ConfirmFor
     resolver: zodResolver(ConfirmFormSchema),
   });
 
-  function onSubmit(data: z.infer<typeof ConfirmFormSchema>) {
+  async function onSubmit(data: z.infer<typeof ConfirmFormSchema>) {
     // 확인(confirm) 처리
     toast.success("Confirmed!");
     onToggleConfirmed(place);
@@ -61,6 +62,42 @@ export function ConfirmForm({ place, onToggleConfirmed, onAddEvent }: ConfirmFor
     }
 
     console.log(data);
+
+    // Prepare API request payload
+    const requestBody = {
+      title: place.name,
+      address: place.address,
+      content: place.content,
+      type: place.type || "Tour",
+      rating: place.rating,
+      iconType: "STAR",
+      placeId: place.placeId,
+      schedule: {
+        startTime: data.startDate.toISOString(),
+        endTime: data.endDate.toISOString()
+      },
+      lat: place.lat,
+      lng: place.lng,
+    }
+
+    // Make API request using fetchAuth instead of useApi
+    // Extract chatRoomId from URL query parameter
+    const searchParams = new URLSearchParams(window.location.search);
+    const chatRoomId = searchParams.get('id');
+
+    if (!chatRoomId) {
+      toast.error("Chat room ID not found");
+      return;
+    }
+
+    const response = await fetchAuth(`/maps/${chatRoomId}/pins`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    });
+
   }
 
   function handleDateSelect(
