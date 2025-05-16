@@ -26,7 +26,12 @@ export function ConfirmDialog({ place }: PlaceCardProps) {
   const getMarker = useLikedPlaces((state) => state.getMarker);
   const schedules = useScheduleStore((state) => state.schedules);
   const [isDeleting, setIsDeleting] = useState(false);
-  const refreshScheduleTrigger = useWebSocketStore((state) => state.refreshScheduleTrigger);
+  const refreshScheduleTrigger = useWebSocketStore(
+    (state) => state.refreshScheduleTrigger
+  );
+  const requestRefreshMap = useWebSocketStore(
+    (state) => state.requestRefreshMap
+  );
 
   const deleteSchedulesByPlaceId = async (name: string) => {
     // Find all schedules associated with this place
@@ -58,9 +63,8 @@ export function ConfirmDialog({ place }: PlaceCardProps) {
 
       // Trigger refresh of schedules
       useWebSocketStore.setState({
-        refreshScheduleTrigger: refreshScheduleTrigger + 1
+        refreshScheduleTrigger: refreshScheduleTrigger + 1,
       });
-
     } catch (error) {
       console.error("Error deleting schedules:", error);
       toast.error("Failed to remove schedules");
@@ -78,6 +82,8 @@ export function ConfirmDialog({ place }: PlaceCardProps) {
       await deleteSchedulesByPlaceId(place.name);
     }
 
+    requestRefreshMap();
+
     setIconType(placeId, isConfirmed ? IconType.HEART : IconType.STAR);
     const marker = getMarker(placeId);
 
@@ -94,7 +100,10 @@ export function ConfirmDialog({ place }: PlaceCardProps) {
       <div
         className="h-[28px] rounded-xl bg-black text-white hover:bg-gray-500 text-center w-[80px] flex items-center justify-center hover:cursor-pointer"
         onClick={() => toggleConfirmed(place)}
-        style={{ opacity: isDeleting ? 0.7 : 1, cursor: isDeleting ? "not-allowed" : "pointer" }}
+        style={{
+          opacity: isDeleting ? 0.7 : 1,
+          cursor: isDeleting ? "not-allowed" : "pointer",
+        }}
       >
         {isDeleting ? "Removing..." : "Remove"}
       </div>
