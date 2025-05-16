@@ -1,7 +1,17 @@
-export const parseJwt = (token: string | null) => {
-  if (!token) {
-    return "";
-  }
+interface GoogleJwtPayload {
+  sub: string;
+  auth: string;
+  email: string;
+  name: string;
+  provider: string;
+  imageUrl: string;
+  exp: number;
+}
+
+export const parseJwt = (token: string): GoogleJwtPayload => {
+  // if (!token) {
+  //   return null;
+  // }
 
   const base64Url = token.split(".")[1];
   const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");

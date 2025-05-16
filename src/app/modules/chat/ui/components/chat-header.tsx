@@ -75,6 +75,7 @@ export function ChatHeader({
   // 사용자 정보
   const accessToken = useAuthStore((state) => state.accessToken);
   const currentUser = accessToken ? parseJwt(accessToken).name : "User";
+  const userImage = accessToken ? parseJwt(accessToken).imageUrl : "/placeholder.svg";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-10 bg-background border-b border-primary/10 h-14 flex items-center px-4">
@@ -168,9 +169,15 @@ export function ChatHeader({
             <EyeIcon className="h-3 w-3" />
           )}
         </Button>
-        <Button className="h-8 w-fit">
+        <Avatar className="h-8 w-8">
+          <AvatarImage src={userImage} alt="User Avatar" />
+          <AvatarFallback>
+            {currentUser.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        {/* <Button className="h-8 w-fit">
           {currentUser}
-        </Button>
+        </Button> */}
       </div>
     </header>
   );

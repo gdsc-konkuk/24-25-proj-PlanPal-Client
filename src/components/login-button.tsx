@@ -12,9 +12,9 @@ interface LoginButtonProps {
 }
 
 export function LoginButton({ setShowLoginModal }: LoginButtonProps) {
-  const accessToken = useAuthStore((state) => state.accessToken);
-  const [showUserMenu, setShowUserMenu] = useState(false);
   const router = useRouter();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const accessToken = useAuthStore((state) => state.accessToken);
   const currentUser = accessToken ? parseJwt(accessToken).name : "U";
 
   const handleLogin = () => {
