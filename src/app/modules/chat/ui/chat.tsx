@@ -95,8 +95,6 @@ export default function Chat() {
   const handleSendMessage = (type: "chat" | "aiRequest") => {
     if (!inputValue.trim()) return;
 
-    console.log(type);
-
     const userMessage: ChatMessage = {
       type,
       senderName: currentUser,
