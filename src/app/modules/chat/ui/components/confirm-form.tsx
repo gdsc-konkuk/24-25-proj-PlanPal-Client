@@ -86,14 +86,14 @@ export function ConfirmForm({ place, onToggleConfirmed }: ConfirmFormProps) {
       >
         <DateTimePickerField
           name="startDate"
-          label="Enter Start Date & Time (12h)"
+          label="Start Date & Time (AM / PM)"
           onDateSelect={handleDateSelect}
           onTimeChange={handleTimeChange}
           form={form}
         />
         <DateTimePickerField
           name="endDate"
-          label="Enter End Date & Time (12h)"
+          label="End Date & Time (AM / PM)"
           onDateSelect={handleDateSelect}
           onTimeChange={handleTimeChange}
           form={form}
@@ -144,9 +144,9 @@ function DateTimePickerField({
                   )}
                 >
                   {field.value ? (
-                    format(field.value, "MM/dd/yyyy hh:mm aa")
+                    format(field.value, "yyyy.MM.dd hh:mm aa")
                   ) : (
-                    <span>MM/DD/YYYY hh:mm aa</span>
+                    <span>YYYY.MM.DD  hh:mm  AM/PM</span>
                   )}
                   <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                 </Button>
@@ -164,14 +164,14 @@ function DateTimePickerField({
                   <ScrollArea className="w-64 sm:w-auto">
                     <div className="flex sm:flex-col p-2">
                       {Array.from({ length: 12 }, (_, i) => i + 1)
-                        .reverse()
+                        // .reverse()
                         .map((hour) => (
                           <Button
                             key={hour}
                             size="icon"
                             variant={
                               field.value &&
-                              field.value.getHours() % 12 === hour % 12
+                                field.value.getHours() % 12 === hour % 12
                                 ? "default"
                                 : "ghost"
                             }
@@ -218,8 +218,8 @@ function DateTimePickerField({
                           size="icon"
                           variant={
                             field.value &&
-                            ((ampm === "AM" && field.value.getHours() < 12) ||
-                              (ampm === "PM" && field.value.getHours() >= 12))
+                              ((ampm === "AM" && field.value.getHours() < 12) ||
+                                (ampm === "PM" && field.value.getHours() >= 12))
                               ? "default"
                               : "ghost"
                           }
