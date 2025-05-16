@@ -30,37 +30,42 @@ export default function Chat() {
     middlePanelVisible,
     rightPanelVisible,
     setPanelVisibility,
-    togglePanel
+    togglePanel,
   } = usePanelVisibilityStore();
 
   // 패널 가시성에 따라 동적으로 defaultWidth 값 계산
-  const { defaultLeftWidth, defaultMiddleWidth, defaultRightWidth } = useMemo(() => {
-    // 활성화된 패널 수 계산
-    const visibleCount = [leftPanelVisible, middlePanelVisible, rightPanelVisible].filter(Boolean).length;
+  const { defaultLeftWidth, defaultMiddleWidth, defaultRightWidth } =
+    useMemo(() => {
+      // 활성화된 패널 수 계산
+      const visibleCount = [
+        leftPanelVisible,
+        middlePanelVisible,
+        rightPanelVisible,
+      ].filter(Boolean).length;
 
-    if (visibleCount === 1) {
-      // 하나의 패널만 보이는 경우, 해당 패널의 너비를 100%로 설정
-      return {
-        defaultLeftWidth: leftPanelVisible ? 100 : 0,
-        defaultMiddleWidth: middlePanelVisible ? 100 : 0,
-        defaultRightWidth: rightPanelVisible ? 100 : 0
-      };
-    } else if (visibleCount === 2) {
-      // 두 개의 패널이 보이는 경우, 각각 50%씩 할당
-      return {
-        defaultLeftWidth: leftPanelVisible ? 50 : 0,
-        defaultMiddleWidth: middlePanelVisible ? 50 : 0,
-        defaultRightWidth: rightPanelVisible ? 50 : 0
-      };
-    } else {
-      // 세 개의 패널이 모두 보이는 경우 또는 모두 숨겨진 경우(예외 처리)
-      return {
-        defaultLeftWidth: 56,
-        defaultMiddleWidth: 24,
-        defaultRightWidth: 20
-      };
-    }
-  }, [leftPanelVisible, middlePanelVisible, rightPanelVisible]);
+      if (visibleCount === 1) {
+        // 하나의 패널만 보이는 경우, 해당 패널의 너비를 100%로 설정
+        return {
+          defaultLeftWidth: leftPanelVisible ? 100 : 0,
+          defaultMiddleWidth: middlePanelVisible ? 100 : 0,
+          defaultRightWidth: rightPanelVisible ? 100 : 0,
+        };
+      } else if (visibleCount === 2) {
+        // 두 개의 패널이 보이는 경우, 각각 50%씩 할당
+        return {
+          defaultLeftWidth: leftPanelVisible ? 50 : 0,
+          defaultMiddleWidth: middlePanelVisible ? 50 : 0,
+          defaultRightWidth: rightPanelVisible ? 50 : 0,
+        };
+      } else {
+        // 세 개의 패널이 모두 보이는 경우 또는 모두 숨겨진 경우(예외 처리)
+        return {
+          defaultLeftWidth: 56,
+          defaultMiddleWidth: 24,
+          defaultRightWidth: 20,
+        };
+      }
+    }, [leftPanelVisible, middlePanelVisible, rightPanelVisible]);
 
   const [activeLeftTab, setActiveLeftTab] = useState("map");
   const [activePlacesTab, setActivePlacesTab] =
@@ -83,15 +88,15 @@ export default function Chat() {
   };
 
   // 패널 토글 핸들러 - 스토어의 함수 사용
-  const toggleLeftPanel = () => togglePanel('left');
-  const toggleMiddlePanel = () => togglePanel('middle');
-  const toggleRightPanel = () => togglePanel('right');
+  const toggleLeftPanel = () => togglePanel("left");
+  const toggleMiddlePanel = () => togglePanel("middle");
+  const toggleRightPanel = () => togglePanel("right");
 
-  const handleSendMessage = () => {
+  const handleSendMessage = (type: "chat" | "aiRequest") => {
     if (!inputValue.trim()) return;
 
     const userMessage: ChatMessage = {
-      type: "chat",
+      type,
       senderName: currentUser,
       text: inputValue,
       sendAt: new Date().toISOString(),
@@ -105,7 +110,7 @@ export default function Chat() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey && !isComposing) {
       e.preventDefault();
-      handleSendMessage();
+      handleSendMessage("chat");
     }
   };
 
@@ -119,12 +124,12 @@ export default function Chat() {
         eventData.type === "Food"
           ? "#F59E0B"
           : eventData.type === "Tour"
-            ? "#88C58F"
-            : eventData.type === "Stay"
-              ? "#60A5FA"
-              : eventData.type === "Move"
-                ? "#A78BFA"
-                : "#94A3B8",
+          ? "#88C58F"
+          : eventData.type === "Stay"
+          ? "#60A5FA"
+          : eventData.type === "Move"
+          ? "#A78BFA"
+          : "#94A3B8",
     };
 
     setScheduleItems((prev) => [...prev, newEvent]);
@@ -147,7 +152,9 @@ export default function Chat() {
       {/* Main Content with Resizable Layout */}
       <div className="w-full mt-14">
         <ResizableLayout
-          key={`panels-${leftPanelVisible ? 1 : 0}-${middlePanelVisible ? 1 : 0}-${rightPanelVisible ? 1 : 0}`}
+          key={`panels-${leftPanelVisible ? 1 : 0}-${
+            middlePanelVisible ? 1 : 0
+          }-${rightPanelVisible ? 1 : 0}`}
           leftContent={
             <LeftPanel
               activeTab={activeLeftTab}
@@ -170,7 +177,7 @@ export default function Chat() {
               messages={chatMessages}
               inputValue={inputValue}
               onInputChange={setInputValue}
-              onSendMessage={handleSendMessage}
+              onAIRequest={handleSendMessage}
               onKeyDown={handleKeyDown}
               onSetIsComposing={(value) => setIsComposing(value)}
             />
