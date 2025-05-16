@@ -28,7 +28,7 @@ export type ScheduleItem = {
   date: Date;
   startTime: Date;
   endTime: Date;
-  type: "식사" | "관광" | "숙박" | "이동" | "기타";
+  type: "Food" | "Tour" | "Stay" | "Move" | "Etc";
   description?: string;
   color?: string;
 };
@@ -48,11 +48,11 @@ const HOUR_INTERVALS = Array.from({ length: 48 }, (_, i) => {
 
 // 이벤트 유형별 색상
 const TYPE_COLORS = {
-  식사: "#F59E0B",
-  관광: "#88C58F",
-  숙박: "#60A5FA",
-  이동: "#A78BFA",
-  기타: "#94A3B8",
+  Food: "#F59E0B",
+  Tour: "#88C58F",
+  Stay: "#60A5FA",
+  Move: "#A78BFA",
+  Etc: "#94A3B8",
 };
 
 export function WeeklyScheduleView({
@@ -248,14 +248,14 @@ export function WeeklyScheduleView({
           onClick={() => setShowAddEventDialog(true)}
           className="gap-1"
         >
-          <Plus className="h-4 w-4" /> 일정 추가
+          <Plus className="h-4 w-4" /> Add Schedule
         </Button>
       </div>
 
       {/* 일정 추가 다이얼로그 */}
       <Dialog open={showAddEventDialog} onOpenChange={setShowAddEventDialog}>
         <DialogContent className="sm:max-w-[500px]">
-          <DialogTitle>새 일정 추가</DialogTitle>
+          <DialogTitle>Add New Schedule</DialogTitle>
           <AddEventForm
             selectedDate={selectedDate}
             onAddEvent={handleAddEvent}

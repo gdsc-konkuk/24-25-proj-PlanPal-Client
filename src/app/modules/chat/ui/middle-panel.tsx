@@ -134,12 +134,11 @@ export const MiddlePanel = ({
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="식사">식사</SelectItem>
-                  <SelectItem value="관광">관광</SelectItem>
-                  <SelectItem value="숙박">숙박</SelectItem>
-                  <SelectItem value="이동">이동</SelectItem>
-                  <SelectItem value="기타">기타</SelectItem>
+                  <SelectItem value="Food">Food</SelectItem>
+                  <SelectItem value="Tour">Tour</SelectItem>
+                  <SelectItem value="Stay">Stay</SelectItem>
+                  <SelectItem value="Move">Move</SelectItem>
+                  <SelectItem value="Etc">Etc</SelectItem>
                 </SelectContent>
               </Select>
             </div>

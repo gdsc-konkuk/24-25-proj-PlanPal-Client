@@ -166,7 +166,7 @@ export default function Chat() {
           isConfirmed: false,
           visitTime: new Date(2023, 5, 18, 9, 0),
           duration: 120,
-          type: "관광" as "식사" | "관광" | "숙박" | "이동" | "기타",
+          type: "관광" as "Food" | "Tour" | "Stay" | "Move" | "Etc",
         };
       } else if (
         inputValue.toLowerCase().includes("plan") ||
@@ -250,15 +250,15 @@ export default function Chat() {
       ...eventData,
       placeId: eventData.placeId || `temp-${Date.now()}`, // Provide a fallback for placeId
       color:
-        eventData.type === "식사"
+        eventData.type === "Food"
           ? "#F59E0B"
-          : eventData.type === "관광"
-          ? "#88C58F"
-          : eventData.type === "숙박"
-          ? "#60A5FA"
-          : eventData.type === "이동"
-          ? "#A78BFA"
-          : "#94A3B8",
+          : eventData.type === "Tour"
+            ? "#88C58F"
+            : eventData.type === "Stay"
+              ? "#60A5FA"
+              : eventData.type === "Move"
+                ? "#A78BFA"
+                : "#94A3B8",
     };
 
     setScheduleItems((prev) => [...prev, newEvent]);

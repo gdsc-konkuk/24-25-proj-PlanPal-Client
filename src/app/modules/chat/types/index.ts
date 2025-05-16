@@ -35,7 +35,7 @@ export type PlaceInfo = {
   addedAt?: Date;
   visitTime?: Date;
   duration?: number; // 방문 예상 시간(분)
-  type?: "식사" | "관광" | "숙박" | "이동" | "기타";
+  type?: "Food" | "Tour" | "Stay" | "Move" | "Etc";
 };
 
 type ScheduleItem = {
@@ -45,7 +45,7 @@ type ScheduleItem = {
   date: Date;
   startTime: Date;
   endTime: Date;
-  type: "식사" | "관광" | "숙박" | "이동" | "기타";
+  type: "Food" | "Tour" | "Stay" | "Move" | "Etc";
   description?: string;
   color?: string;
 };
@@ -55,7 +55,7 @@ export type PlacesTabType = "confirmed" | "candidates";
 export type EventDataType = Omit<ScheduleItem, "id" | "color">;
 
 // The existing PlaceType from middle-panel.tsx can also be moved here
-export type PlaceType = "식사" | "관광" | "숙박" | "이동" | "기타";
+export type PlaceType = "Food" | "Tour" | "Stay" | "Move" | "Etc";
 
 // API response type for chat rooms list
 export interface ChatRoom {
