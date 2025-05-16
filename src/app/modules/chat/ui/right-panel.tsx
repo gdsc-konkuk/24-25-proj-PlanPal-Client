@@ -17,6 +17,7 @@ interface RightPanelProps {
   onKeyDown: (e: React.KeyboardEvent) => void;
   onToggleConfirmed?: (id: string) => void;
   onToggleFavorite?: (id: string) => void;
+  onSetIsComposing: (isComposing: boolean) => void;
 }
 
 export const RightPanel = ({
@@ -27,13 +28,19 @@ export const RightPanel = ({
   onSendMessage,
   onKeyDown,
   onToggleConfirmed,
-  onToggleFavorite
+  onToggleFavorite,
+  onSetIsComposing,
 }: RightPanelProps) => {
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = messagesContainerRef.current;
+    const end = messagesEndRef.current;
+
+    if (container && end) {
+      container.scrollTop = container.scrollHeight;
+    }
   }, [messages]);
 
   return (
@@ -53,7 +60,10 @@ export const RightPanel = ({
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div
+        className="flex-1 overflow-y-auto p-4 space-y-4"
+        ref={messagesContainerRef}
+      >
         {messages.map((message) => (
           <ChatMessage
             key={message.id}
@@ -71,6 +81,8 @@ export const RightPanel = ({
           <Input
             value={inputValue}
             onChange={(e) => onInputChange(e.target.value)}
+            onCompositionStart={() => onSetIsComposing(true)}
+            onCompositionEnd={() => onSetIsComposing(false)}
             onKeyDown={onKeyDown}
             placeholder="Type your message or use # for commands..."
             className="flex-1"
