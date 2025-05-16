@@ -20,7 +20,7 @@ export function AuthInitializer() {
           }
         );
 
-        if (!res.ok) router.push("/");
+        // if (!res.ok) router.push("/");
 
         const { accessToken } = await res.json();
         setAccessToken(accessToken);

@@ -4,29 +4,36 @@ import { oauthRequest } from "@/app/modules/auth/api/oauth";
 import { useAuthStore } from "@/store/auth-store";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 function GoogleAuth() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const code = searchParams.get("code");
-  let accessToken = null;
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchAccessToken = async () => {
       if (code) {
         try {
-          accessToken = await oauthRequest(code);
+          setIsLoading(true);
+          const accessToken = await oauthRequest(code);
           useAuthStore.setState({ accessToken });
+          toast.success("Login successful");
         } catch (error) {
+          toast.error(`error : ${(error as Error).message}`);
           setError(`error : ${(error as Error).message}`);
+          setIsLoading(false);
         }
+      } else {
+        setIsLoading(false);
       }
     };
 
     fetchAccessToken();
     router.push("/");
-  }, [code]);
+  }, [code, router]);
 
   if (code)
     return (
