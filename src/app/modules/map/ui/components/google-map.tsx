@@ -9,6 +9,7 @@ import { useApi } from "@/hooks/use-api";
 import { IconType, useLikedPlaces } from "../../store/liked-place-store";
 import { useAuthStore } from "@/store/auth-store";
 import { parseJwt } from "@/lib/parseJwt";
+import { useWebSocketStore } from "@/app/modules/chat/store/websocket-store";
 
 interface MapConfigResponse {
   id: number;
@@ -43,11 +44,17 @@ export function GoogleMap() {
   const setMap = useMapStore((state) => state.setMap);
   const googleMaps = useMapStore((state) => state.googleMaps);
   const setGoogleMaps = useMapStore((state) => state.setGoogleMaps);
+  const refreshMapTrigger = useWebSocketStore(
+    (state) => state.refreshMapTrigger
+  );
   const searchParams = useSearchParams();
 
   const chatRoomId = searchParams.get("id");
   const addPlace = useLikedPlaces((state) => state.addPlace);
   const setMarker = useLikedPlaces((state) => state.setMarker);
+  const setLikedPlacesNull = useLikedPlaces(
+    (state) => state.setLikedPlacesNull
+  );
 
   const accessToken = useAuthStore((s) => s.accessToken);
   if (!accessToken) return null;
@@ -130,6 +137,8 @@ export function GoogleMap() {
         }
       });
 
+      setLikedPlacesNull();
+
       mapConfig.pins.forEach((pin) => {
         const img = document.createElement("img");
         img.src = pin.iconType === IconType.HEART ? "/heart.png" : "/star.png";
@@ -163,7 +172,7 @@ export function GoogleMap() {
     };
 
     initMap();
-  }, [searchParams]);
+  }, [searchParams, refreshMapTrigger]);
 
   return (
     <div className="relative w-full h-full">
