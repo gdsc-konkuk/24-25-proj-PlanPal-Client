@@ -17,8 +17,8 @@ interface ChatMessageCardProps {
 export const ChatMessageCard = ({ message }: ChatMessageCardProps) => {
   const accessToken = useAuthStore((s) => s.accessToken);
   if (!accessToken) return null;
-  const currentUserName = parseJwt(accessToken!).name;
-  const currentUserImageUrl = parseJwt(accessToken!).imageUrl;
+  const currentUserName = parseJwt(accessToken).name;
+  const currentUserImageUrl = parseJwt(accessToken).imageUrl;
   const sendAt = new Date(message.sendAt!);
 
   const [hovered, setHovered] = useState(false);
@@ -41,9 +41,13 @@ export const ChatMessageCard = ({ message }: ChatMessageCardProps) => {
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
         >
-          {message.type === "chat" && currentUserImageUrl ? (
+          {message.type === "chat" ? (
             <AvatarImage
-              src={currentUserImageUrl}
+              src={
+                message.senderName === currentUserName
+                  ? currentUserImageUrl
+                  : message.imgUrl
+              }
               alt="User Avatar"
               className="h-8 w-8"
             />
