@@ -7,7 +7,7 @@ type WebSocketStore = {
   refreshMapTrigger: number;
   refreshScheduleTrigger: number;
   connect: (roomId: string, userName: string) => void;
-  sendMessage: (type: "chat" | "ai", msg: string) => void;
+  sendMessage: (type: "chat" | "aiRequest", msg: string) => void;
   addMessage: (message: ChatMessage) => void;
 };
 

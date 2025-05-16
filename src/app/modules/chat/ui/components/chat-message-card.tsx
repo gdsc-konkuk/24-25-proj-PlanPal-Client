@@ -41,7 +41,7 @@ export const ChatMessageCard = ({ message }: ChatMessageCardProps) => {
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
         >
-          {message.type === "chat" ? (
+          {message.type === "chat" || message.type === "aiRequest" ? (
             <AvatarImage
               src={
                 message.senderName === currentUserName
