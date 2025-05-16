@@ -103,7 +103,7 @@ export default function Chat() {
     };
 
     addMessage(userMessage);
-    sendMessage("chat", inputValue);
+    sendMessage(type, inputValue);
     setInputValue("");
   };
 
