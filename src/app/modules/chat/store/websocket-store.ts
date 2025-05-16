@@ -5,6 +5,7 @@ type WebSocketStore = {
   socket: WebSocket | null;
   chatMessages: ChatMessage[];
   refreshMapTrigger: number;
+  refreshScheduleTrigger: number;
   connect: (roomId: string, userName: string) => void;
   sendMessage: (type: "chat" | "ai", msg: string) => void;
   addMessage: (message: ChatMessage) => void;
@@ -21,6 +22,7 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
     },
   ],
   refreshMapTrigger: 0,
+  refreshScheduleTrigger: 0,
 
   connect: (roomId, userName) => {
     if (get().socket) return;
@@ -48,6 +50,12 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
           case "refreshMap":
             set((state) => ({
               refreshMapTrigger: state.refreshMapTrigger + 1,
+            }));
+            break;
+
+          case "refreshSchedule":
+            set((state) => ({
+              refreshScheduleTrigger: state.refreshScheduleTrigger + 1,
             }));
             break;
 
