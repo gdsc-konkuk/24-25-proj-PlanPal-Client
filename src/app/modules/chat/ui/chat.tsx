@@ -12,6 +12,7 @@ import { ChatHeader } from "./components/chat-header";
 import type { ScheduleItem } from "@/components/weekly-schedule-view";
 import { useAuthStore } from "@/store/auth-store";
 import { parseJwt } from "@/lib/parseJwt";
+import { WebSocketInitializer } from "../initializer/websocket-initializer";
 
 export default function Chat() {
   const searchParams = useSearchParams();
@@ -259,6 +260,7 @@ export default function Chat() {
 
   return (
     <div className="flex h-screen bg-muted/30 overflow-hidden">
+      <WebSocketInitializer roomId={travelId!} />
       {/* Header */}
       <ChatHeader
         travelId={travelId}
