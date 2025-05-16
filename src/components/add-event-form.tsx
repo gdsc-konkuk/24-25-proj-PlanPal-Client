@@ -12,9 +12,9 @@ import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { useApi } from "@/hooks/use-api"
 import { toast } from "sonner"
 import { useWebSocketStore } from "@/app/modules/chat/store/websocket-store"
+import { fetchAuth } from "@/lib/fetch-auth" // Import fetchAuth instead of using useApi
 
 type EventType = "Food" | "Tour" | "Stay" | "Move" | "Etc"
 
@@ -68,7 +68,6 @@ export function AddEventForm({ selectedDate, chatRoomId, onAddEvent, onCancel }:
   const likedPlaces = useLikedPlaces((state) => state.likedPlaces)
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const api = useApi()
   const refreshScheduleTrigger = useWebSocketStore((state) => state.refreshScheduleTrigger)
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
@@ -132,16 +131,18 @@ export function AddEventForm({ selectedDate, chatRoomId, onAddEvent, onCancel }:
         content: selectedPlace.content,
         type: selectedPlace.type || "Tour",
         rating: selectedPlace.rating,
-        iconType: selectedPlace.iconType,
+        iconType: "STAR",
         placeId: selectedPlace.placeId,
         schedule: {
           startTime: data.startDate.toISOString(),
           endTime: data.endDate.toISOString()
-        }
+        },
+        lat: selectedPlace.lat,
+        lng: selectedPlace.lng,
       }
 
-      // Make API request to add pin with schedule
-      await api(`/maps/${chatRoomId}/pins`, {
+      // Make API request using fetchAuth instead of useApi
+      const response = await fetchAuth(`/maps/${chatRoomId}/pins`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -149,19 +150,24 @@ export function AddEventForm({ selectedDate, chatRoomId, onAddEvent, onCancel }:
         body: JSON.stringify(requestBody),
       })
 
-      // If API call is successful, add event to calendar
-      onAddEvent({
-        title: selectedPlace.name,
-        date: data.startDate,
-        startTime: data.startDate,
-        endTime: data.endDate,
-        type: (selectedPlace.type as EventType) || "Tour",
-        placeId: selectedPlace.placeId,
-        color: eventColor
-      })
+      // Check if response is successful based on res.ok instead of parsing JSON
+      if (response.ok) {
+        // If API call is successful, add event to calendar
+        onAddEvent({
+          title: selectedPlace.name,
+          date: data.startDate,
+          startTime: data.startDate,
+          endTime: data.endDate,
+          type: (selectedPlace.type as EventType) || "Tour",
+          placeId: selectedPlace.placeId,
+          color: eventColor
+        })
 
-      toast.success("Event added to calendar")
-      onCancel() // Close the form
+        toast.success("Event added to calendar")
+        onCancel() // Close the form
+      } else {
+        throw new Error(`Server responded with status: ${response.status}`)
+      }
     } catch (error) {
       console.error("Failed to add event:", error)
       toast.error("Failed to add event to calendar")

@@ -7,6 +7,7 @@ import { GoogleMap } from "@/app/modules/map/ui/components/google-map";
 import { WeeklyScheduleView } from "@/components/weekly-schedule-view";
 import type { ScheduleItem } from "@/components/weekly-schedule-view";
 import { LikedPlace } from "@/app/modules/map/store/liked-place-store";
+import { useSchedules } from "../hooks/use-schedules";
 
 interface LeftPanelProps {
   activeTab: string;
@@ -14,17 +15,19 @@ interface LeftPanelProps {
   scheduleItems: ScheduleItem[];
   places: LikedPlace[];
   onAddEvent: (eventData: Omit<ScheduleItem, "id" | "color">) => void;
-  chatRoomId: string; // Add chatRoomId prop
+  chatRoomId: string;
 }
 
 export const LeftPanel = ({
   activeTab,
   onTabChange,
-  scheduleItems,
   places,
   onAddEvent,
   chatRoomId,
 }: LeftPanelProps) => {
+  // Use our custom hook to fetch and manage schedules
+  const { schedules, isLoading, error } = useSchedules(chatRoomId);
+
   return (
     <Tabs
       defaultValue="map"
@@ -61,11 +64,13 @@ export const LeftPanel = ({
             "opacity-0 invisible pointer-events-none": activeTab !== "calendar",
           })}
         >
+          {isLoading && <div className="p-4">Loading schedules...</div>}
+          {error && <div className="p-4 text-destructive">Error: {error}</div>}
           <WeeklyScheduleView
-            scheduleItems={scheduleItems}
+            scheduleItems={schedules}
             places={places}
             onAddEvent={onAddEvent}
-            chatRoomId={chatRoomId} // Pass chatRoomId
+            chatRoomId={chatRoomId}
           />
         </div>
       </div>
