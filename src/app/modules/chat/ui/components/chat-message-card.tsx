@@ -81,11 +81,13 @@ export const ChatMessageCard = ({ message }: ChatMessageCardProps) => {
             </div>
           )}
           <Card
-            className={`${
+            className={`${cn(
               message.type === "aiResponse"
-                ? "bg-secondary/20 border-secondary/30"
+                ? "bg-blue-400 border-secondary/30"
+                : message.type === "aiRequest"
+                ? "bg-yellow-200 border-accent/30"
                 : ""
-            }`}
+            )}`}
           >
             <CardContent className="p-3 text-sm">{message.text}</CardContent>
           </Card>
