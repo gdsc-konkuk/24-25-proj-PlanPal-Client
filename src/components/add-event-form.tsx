@@ -15,6 +15,24 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
 type EventType = "Food" | "Tour" | "Stay" | "Move" | "Etc"
 
+// Predefined event colors
+const EVENT_COLORS = [
+  "#4f46e5", // indigo
+  "#10b981", // emerald
+  "#ef4444", // red
+  "#f59e0b", // amber
+  "#8b5cf6", // violet
+  "#ec4899", // pink
+  "#06b6d4", // cyan
+  "#84cc16", // lime
+];
+
+// Function to get a random color from the predefined colors
+const getRandomColor = (): string => {
+  const randomIndex = Math.floor(Math.random() * EVENT_COLORS.length);
+  return EVENT_COLORS[randomIndex];
+};
+
 interface AddEventFormProps {
   selectedDate: Date
   onAddEvent: (event: {
@@ -25,6 +43,7 @@ interface AddEventFormProps {
     type: EventType
     description?: string
     placeId?: string
+    color: string // Add color property to the event interface
   }) => void
   onCancel: () => void
 }
@@ -93,13 +112,17 @@ export function AddEventForm({ selectedDate, onAddEvent, onCancel }: AddEventFor
 
     if (!selectedPlace) return
 
+    // Generate a random color for the event
+    const eventColor = getRandomColor();
+
     onAddEvent({
       title: selectedPlace.name,
       date: data.startDate,
       startTime: data.startDate,
       endTime: data.endDate,
-      type: (selectedPlace.type as EventType) || "Etc",
-      placeId: selectedPlace.placeId
+      type: (selectedPlace.type as EventType) || "Tour",
+      placeId: selectedPlace.placeId,
+      color: eventColor // Add the random color
     })
   }
 

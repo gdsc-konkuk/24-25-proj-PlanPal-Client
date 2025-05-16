@@ -214,8 +214,12 @@ export function WeeklyScheduleView({
                           key={event.id}
                           className="absolute rounded-md p-1 overflow-hidden text-xs"
                           style={{
-                            backgroundColor: `${TYPE_COLORS[event.type]}20`,
-                            borderLeft: `3px solid ${TYPE_COLORS[event.type]}`,
+                            backgroundColor: event.color
+                              ? `${event.color}20`
+                              : `${TYPE_COLORS[event.type]}20`,
+                            borderLeft: event.color
+                              ? `3px solid ${event.color}`
+                              : `3px solid ${TYPE_COLORS[event.type]}`,
                             top: `${index * 1.5}rem`,
                             height: `${heightInSlots * 1.5}rem`,
                             left: "0.125rem",
