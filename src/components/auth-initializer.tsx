@@ -2,10 +2,12 @@
 
 import { useEffect } from "react";
 import { useAuthStore } from "@/store/auth-store";
+import { useRouter } from "next/navigation";
 
 export function AuthInitializer() {
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
   const setInitialized = useAuthStore((state) => state.setInitialized);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchAccessToken = async () => {
@@ -18,7 +20,7 @@ export function AuthInitializer() {
           }
         );
 
-        if (!res.ok) throw new Error("Not logged in");
+        if (!res.ok) router.push("/");
 
         const { accessToken } = await res.json();
         setAccessToken(accessToken);
