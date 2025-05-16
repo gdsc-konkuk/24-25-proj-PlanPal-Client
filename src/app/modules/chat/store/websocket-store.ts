@@ -1,23 +1,32 @@
 import { create } from "zustand";
+import { ChatMessage } from "../types";
 
 type WebSocketStore = {
   socket: WebSocket | null;
-  chatMessages: string[];
+  chatMessages: ChatMessage[];
   refreshMapTrigger: number;
   connect: (roomId: string, userName: string) => void;
   sendMessage: (type: "chat" | "ai", msg: string) => void;
+  addMessage: (message: ChatMessage) => void;
 };
 
 export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
   socket: null,
-  chatMessages: [],
+  chatMessages: [
+    {
+      type: "ai",
+      text: "Welcome to your group travel planning session! I'm your AI travel assistant. Tell me where you're thinking of going, and I can help with suggestions, cultural insights, and local recommendations. You can also invite friends to join this planning session!",
+      senderName: "ai",
+      sendAt: new Date().toISOString(),
+    },
+  ],
   refreshMapTrigger: 0,
 
   connect: (roomId, userName) => {
     if (get().socket) return;
 
     const socket = new WebSocket(
-      `${process.env.NEXT_PUBLIC_SOCKET_SERVER_URL}/ws/chat?roomId=${roomId}&userName=${userName}`
+      `${process.env.NEXT_PUBLIC_SOCKET_SERVER_URL}?roomId=${roomId}&userName=${userName}`
     );
 
     socket.onopen = () => {
@@ -26,15 +35,16 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
 
     socket.onmessage = (event) => {
       try {
-        const data = JSON.parse(event.data);
+        const data: ChatMessage = JSON.parse(event.data);
         switch (data.type) {
           case "chat":
+          case "ai":
             set((state) => ({
-              chatMessages: [...state.chatMessages, data.text],
+              chatMessages: [...state.chatMessages, data],
             }));
             break;
 
-          case "refreshMap":
+          case "refresh":
             set((state) => ({
               refreshMapTrigger: state.refreshMapTrigger + 1,
             }));
@@ -53,6 +63,12 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
     socket.onclose = () => {
       console.warn("WebSocket closed");
       set({ socket: null });
+      set((state) => ({
+        chatMessages: [
+          ...state.chatMessages,
+          { type: "ai", text: "WebSocket connection closed." },
+        ],
+      }));
     };
 
     set({ socket });
@@ -71,4 +87,7 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
       console.warn("WebSocket is not open.");
     }
   },
+
+  addMessage: (message) =>
+    set((state) => ({ chatMessages: [...state.chatMessages, message] })),
 }));

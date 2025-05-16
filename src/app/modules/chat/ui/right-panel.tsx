@@ -1,34 +1,27 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { MessageSquare, Send, Plus, Info } from "lucide-react";
+import { MessageSquare, Send, Info, InfoIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { MessageType, ParticipantType } from "../types";
-import { ChatMessage } from "./components/chat-message";
+import { ChatMessage } from "../types";
+import { ChatMessageCard } from "./components/chat-message-card";
 
 interface RightPanelProps {
-  messages: MessageType[];
-  participants: ParticipantType[];
+  messages: ChatMessage[];
   inputValue: string;
   onInputChange: (value: string) => void;
   onSendMessage: () => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
-  onToggleConfirmed?: (id: string) => void;
-  onToggleFavorite?: (id: string) => void;
   onSetIsComposing: (isComposing: boolean) => void;
 }
 
 export const RightPanel = ({
   messages,
-  participants,
   inputValue,
   onInputChange,
   onSendMessage,
   onKeyDown,
-  onToggleConfirmed,
-  onToggleFavorite,
   onSetIsComposing,
 }: RightPanelProps) => {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -51,11 +44,6 @@ export const RightPanel = ({
             <MessageSquare className="h-5 w-5 mr-2 text-primary" />
             <h2 className="font-medium">Chat</h2>
           </div>
-          <div className="flex items-center gap-1">
-            <Badge variant="outline" className="text-xs">
-              {participants.length} participants
-            </Badge>
-          </div>
         </div>
       </div>
 
@@ -64,14 +52,20 @@ export const RightPanel = ({
         className="flex-1 overflow-y-auto p-4 space-y-4"
         ref={messagesContainerRef}
       >
-        {messages.map((message) => (
-          <ChatMessage
-            key={message.id}
-            message={message}
-            onToggleConfirmed={onToggleConfirmed}
-            onToggleFavorite={onToggleFavorite}
-          />
-        ))}
+        {messages &&
+          messages.map((message, index) =>
+            message.senderName ? (
+              <ChatMessageCard key={index} message={message} />
+            ) : (
+              <div
+                key={index}
+                className="flex items-center justify-center text-sm text-muted-foreground"
+              >
+                <InfoIcon className="h-4 w-4 mr-1" />
+                {message.text}
+              </div>
+            )
+          )}
         <div ref={messagesEndRef} />
       </div>
 

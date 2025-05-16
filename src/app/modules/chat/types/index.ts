@@ -86,3 +86,10 @@ export interface ChatRoomResponse {
   thumbnailUrl: string;
   createdAt: string;
 }
+
+export interface ChatMessage {
+  type: "chat" | "ai" | "refresh";
+  senderName?: string;
+  text?: string;
+  sendAt?: string;
+}
