@@ -164,7 +164,7 @@ export function WeeklyScheduleView({
               <div
                 key={`time-${hour}-${minute}`}
                 className={cn(
-                  "text-xs text-right pr-2 h-12 flex items-center justify-end border-r",
+                  "text-xs text-right pr-2 h-6 flex items-center justify-end border-r",
                   minute === 0
                     ? "font-medium"
                     : "text-muted-foreground text-[10px]"
@@ -184,7 +184,7 @@ export function WeeklyScheduleView({
                   <div
                     key={`slot-${day.toISOString()}-${hour}-${minute}`}
                     className={cn(
-                      "h-12 border border-dashed border-border/40 rounded-sm p-0.5",
+                      "h-6 border border-dashed border-border/40 rounded-sm p-0.5",
                       events.length > 0 && "bg-muted/30"
                     )}
                   >
@@ -216,8 +216,8 @@ export function WeeklyScheduleView({
                           style={{
                             backgroundColor: `${TYPE_COLORS[event.type]}20`,
                             borderLeft: `3px solid ${TYPE_COLORS[event.type]}`,
-                            top: `${index * 3}rem`,
-                            height: `${heightInSlots * 3}rem`,
+                            top: `${index * 1.5}rem`,
+                            height: `${heightInSlots * 1.5}rem`,
                             left: "0.125rem",
                             right: "0.125rem",
                             zIndex: 5,

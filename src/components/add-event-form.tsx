@@ -130,7 +130,6 @@ export function AddEventForm({ selectedDate, onAddEvent, onCancel }: AddEventFor
               <SelectItem value="360">6 hours</SelectItem>
               <SelectItem value="480">8 hours</SelectItem>
               <SelectItem value="720">12 hours</SelectItem>
-              <SelectItem value="1440">24 hours</SelectItem>
             </SelectContent>
           </Select>
         </div>
