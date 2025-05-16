@@ -73,7 +73,6 @@ export default function Chat() {
   const chatMessages = useWebSocketStore((state) => state.chatMessages);
   const addMessage = useWebSocketStore((state) => state.addMessage);
   const [isComposing, setIsComposing] = useState(false);
-  console.log(chatMessages);
 
   // 패널 가시성 변경 핸들러 - 스토어의 함수 사용
   const handlePanelVisibilityChange = (

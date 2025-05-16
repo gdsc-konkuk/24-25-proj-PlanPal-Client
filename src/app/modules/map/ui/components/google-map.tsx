@@ -4,27 +4,31 @@ import { useEffect, useRef, useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { MapOverlay } from "./map-overlay";
 import { useMapStore } from "@/app/modules/map/store/map-store";
-import { useApi } from "@/hooks/use-api";
 import { useSearchParams } from "next/navigation";
+import { useApi } from "@/hooks/use-api";
+import { IconType, useLikedPlaces } from "../../store/liked-place-store";
+import { useAuthStore } from "@/store/auth-store";
+import { parseJwt } from "@/lib/parseJwt";
 
-// Define interface for API response
-interface MapConfig {
+interface MapConfigResponse {
   id: number;
   chatRoomId: number;
   centerCoordinates: {
     lat: number;
     lng: number;
   };
-  pins: Array<{
-    id: number;
+  pins: {
+    placeId: string;
     userId: number;
     title: string;
     address: string;
     content: string;
     type: string;
     rating: number;
-    iconType: string;
-  }>;
+    iconType: IconType;
+    lat: number;
+    lng: number;
+  }[];
   createdAt: string;
 }
 
@@ -39,22 +43,27 @@ export function GoogleMap() {
   const setMap = useMapStore((state) => state.setMap);
   const googleMaps = useMapStore((state) => state.googleMaps);
   const setGoogleMaps = useMapStore((state) => state.setGoogleMaps);
+  const searchParams = useSearchParams();
+  const chatRoomId = searchParams.get("id");
+  const addPlace = useLikedPlaces((state) => state.addPlace);
+  const setMarker = useLikedPlaces((state) => state.setMarker);
+  const accessToken = useAuthStore((s) => s.accessToken);
+  if (!accessToken) return null;
+  const currentUserName = parseJwt(accessToken!).name;
+
   const api = useApi();
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const initMap = async () => {
-      const chatRoomId = searchParams.get('id');
-
-      let centerCoordinates = { lat: 35.6762, lng: 139.6503 };
-
-      if (chatRoomId) {
-        try {
-          const mapConfig = await api<MapConfig>(`/maps/chat-rooms/${chatRoomId}`);
-          centerCoordinates = mapConfig.centerCoordinates;
-        } catch (err) {
-          console.error("Failed to load map config:", err);
-        }
+      let mapConfig;
+      try {
+        mapConfig = await api<MapConfigResponse>(
+          `/maps/chat-rooms/${chatRoomId}`
+        );
+      } catch (err) {
+        console.error("Failed to load map config:", err);
+        return;
       }
 
       const loader = new Loader({
@@ -74,7 +83,10 @@ export function GoogleMap() {
       setGoogleMaps(maps);
 
       const mapInstance = new maps.Map(mapRef.current as HTMLDivElement, {
-        center: centerCoordinates,
+        center: {
+          lat: mapConfig.centerCoordinates.lat,
+          lng: mapConfig.centerCoordinates.lng,
+        },
         zoom: 13,
         mapId: "min",
       });
@@ -105,6 +117,7 @@ export function GoogleMap() {
                 status === google.maps.places.PlacesServiceStatus.OK &&
                 place
               ) {
+                console.log(place);
                 setPlaceInfo({
                   place,
                   position: evt.latLng!,
@@ -115,6 +128,37 @@ export function GoogleMap() {
           );
         }
       });
+
+      mapConfig.pins.forEach((pin) => {
+        const img = document.createElement("img");
+        img.src = pin.iconType === IconType.HEART ? "/heart.png" : "/star.png";
+        img.style.width = "36px";
+        img.style.height = "36px";
+
+        const marker = new markerLib.AdvancedMarkerElement({
+          map: mapInstance,
+          position: {
+            lat: pin.lat,
+            lng: pin.lng,
+          },
+          content: img,
+        });
+
+        addPlace({
+          placeId: pin.placeId,
+          name: pin.title,
+          iconType: pin.iconType,
+          rating: pin.rating,
+          address: pin.address,
+          content: pin.content,
+          type: pin.type,
+          addedBy: currentUserName,
+          lat: pin.lat,
+          lng: pin.lng,
+        });
+
+        setMarker(pin.placeId, marker);
+      });
     };
 
     initMap();
@@ -123,11 +167,13 @@ export function GoogleMap() {
   return (
     <div className="relative w-full h-full">
       <div ref={mapRef} className="w-full h-full rounded-lg" />
-      {googleMaps && map && placeInfo && (
+      {googleMaps && map && placeInfo && chatRoomId && (
         <MapOverlay
           placeInfo={placeInfo}
           position={placeInfo.position}
           onClose={() => setPlaceInfo(null)}
+          chatRoomId={chatRoomId}
+          currentUserName={currentUserName}
         />
       )}
     </div>

@@ -9,6 +9,7 @@ import {
   useLikedPlaces,
 } from "@/app/modules/map/store/liked-place-store";
 import { useMapStore } from "@/app/modules/map/store/map-store";
+import { useApi } from "@/hooks/use-api";
 
 type MapOverlayProps = {
   position: google.maps.LatLng;
@@ -18,35 +19,75 @@ type MapOverlayProps = {
     placeId: string;
   } | null;
   onClose: () => void;
+  chatRoomId: string;
+  currentUserName: string;
 };
 
-export function MapOverlay({ position, placeInfo, onClose }: MapOverlayProps) {
+export function MapOverlay({
+  position,
+  placeInfo,
+  onClose,
+  chatRoomId,
+  currentUserName,
+}: MapOverlayProps) {
   const { addPlace, removePlace, isLiked, setMarker, getMarker } =
     useLikedPlaces();
   const liked = isLiked(placeInfo!.placeId);
   const map = useMapStore((state) => state.map);
   const googleMaps = useMapStore((state) => state.googleMaps);
 
-  const handleLikeToggle = () => {
+  const api = useApi();
+
+  const handleLikeToggle = async () => {
     if (!map || !googleMaps || !placeInfo) return;
     if (liked) {
       const marker = getMarker(placeInfo.placeId);
       if (marker) marker.map = null;
       removePlace(placeInfo.placeId);
+
+      try {
+        await api(`/maps/${chatRoomId}/pins/${placeInfo.placeId}`, {
+          method: "DELETE",
+        });
+      } catch (error) {
+        console.error("Failed to delete place:", error);
+      }
     } else {
       addPlace({
         placeId: placeInfo.placeId,
         name: placeInfo.place.name || "Unknown",
-        lat: position.lat(),
-        lng: position.lng(),
         iconType: IconType.HEART,
         rating: placeInfo.place.rating || 0,
         address: placeInfo.place.formatted_address || "No address",
-        description:
-          placeInfo.place.formatted_phone_number || "No phone number",
+        content: placeInfo.place.formatted_phone_number || "No phone number",
         type: placeInfo.place.types?.[0] || "Unknown",
-        addedBy: "user",
+        addedBy: currentUserName,
+        lat: placeInfo.position.lat(),
+        lng: placeInfo.position.lng(),
       });
+
+      try {
+        await api(`/maps/${chatRoomId}/pins`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: placeInfo.place.name || "Unknown",
+            address: placeInfo.place.formatted_address || "No address",
+            content:
+              placeInfo.place.formatted_phone_number || "No phone number",
+            type: placeInfo.place.types?.[0] || "Unknown",
+            rating: placeInfo.place.rating || 0,
+            iconType: IconType.HEART,
+            placeId: placeInfo.placeId || "Unknown",
+            lat: placeInfo.position.lat() || 0,
+            lng: placeInfo.position.lng() || 0,
+          }),
+        });
+      } catch (error) {
+        console.error("Failed to save place:", error);
+      }
 
       const img = document.createElement("img");
       img.src = "/heart.png";
