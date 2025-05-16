@@ -5,6 +5,28 @@ import { Loader } from "@googlemaps/js-api-loader";
 import { MapOverlay } from "./map-overlay";
 import { useMapStore } from "@/app/modules/map/store/map-store";
 import { useApi } from "@/hooks/use-api";
+import { useSearchParams } from "next/navigation";
+
+// Define interface for API response
+interface MapConfig {
+  id: number;
+  chatRoomId: number;
+  centerCoordinates: {
+    lat: number;
+    lng: number;
+  };
+  pins: Array<{
+    id: number;
+    userId: number;
+    title: string;
+    address: string;
+    content: string;
+    type: string;
+    rating: number;
+    iconType: string;
+  }>;
+  createdAt: string;
+}
 
 export function GoogleMap() {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -18,16 +40,22 @@ export function GoogleMap() {
   const googleMaps = useMapStore((state) => state.googleMaps);
   const setGoogleMaps = useMapStore((state) => state.setGoogleMaps);
   const api = useApi();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const initMap = async () => {
-      // let mapConfig;
-      // try {
-      //   mapConfig = await api("/maps/chat-rooms/2");
-      // } catch (err) {
-      //   console.error("Failed to load map config:", err);
-      //   return;
-      // }
+      const chatRoomId = searchParams.get('id');
+
+      let centerCoordinates = { lat: 35.6762, lng: 139.6503 };
+
+      if (chatRoomId) {
+        try {
+          const mapConfig = await api<MapConfig>(`/maps/chat-rooms/${chatRoomId}`);
+          centerCoordinates = mapConfig.centerCoordinates;
+        } catch (err) {
+          console.error("Failed to load map config:", err);
+        }
+      }
 
       const loader = new Loader({
         apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
@@ -46,7 +74,7 @@ export function GoogleMap() {
       setGoogleMaps(maps);
 
       const mapInstance = new maps.Map(mapRef.current as HTMLDivElement, {
-        center: { lat: 35.6762, lng: 139.6503 },
+        center: centerCoordinates,
         zoom: 13,
         mapId: "min",
       });
@@ -90,7 +118,7 @@ export function GoogleMap() {
     };
 
     initMap();
-  }, []);
+  }, [searchParams]);
 
   return (
     <div className="relative w-full h-full">
