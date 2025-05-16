@@ -107,6 +107,7 @@ export const MiddlePanel = ({
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="Food">Food</SelectItem>
                   <SelectItem value="Tour">Tour</SelectItem>
                   <SelectItem value="Stay">Stay</SelectItem>
