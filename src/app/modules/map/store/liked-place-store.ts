@@ -8,15 +8,15 @@ export enum IconType {
 export type LikedPlace = {
   placeId: string;
   name: string;
-  lat: number;
-  lng: number;
   marker?: google.maps.marker.AdvancedMarkerElement;
   iconType: IconType;
   rating: number;
   address: string;
-  description: string;
+  content: string;
   type: string;
   addedBy: string;
+  lat: number;
+  lng: number;
 };
 
 type LikedPlaceStore = {

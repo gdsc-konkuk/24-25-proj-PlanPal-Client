@@ -16,6 +16,7 @@ interface ChatMessageCardProps {
 
 export const ChatMessageCard = ({ message }: ChatMessageCardProps) => {
   const accessToken = useAuthStore((s) => s.accessToken);
+  if (!accessToken) return null;
   const currentUserName = parseJwt(accessToken!).name;
   const currentUserImageUrl = parseJwt(accessToken!).imageUrl;
   const sendAt = new Date(message.sendAt!);
