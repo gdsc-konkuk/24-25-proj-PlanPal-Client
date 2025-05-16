@@ -28,7 +28,7 @@ export type ScheduleItem = {
   date: Date;
   startTime: Date;
   endTime: Date;
-  type: "식사" | "관광" | "숙박" | "이동" | "기타";
+  type: "Food" | "Tour" | "Stay" | "Move" | "Etc";
   description?: string;
   color?: string;
 };
@@ -47,12 +47,12 @@ const HOUR_INTERVALS = Array.from({ length: 48 }, (_, i) => {
 });
 
 // 이벤트 유형별 색상
-const TYPE_COLORS = {
-  식사: "#F59E0B",
-  관광: "#88C58F",
-  숙박: "#60A5FA",
-  이동: "#A78BFA",
-  기타: "#94A3B8",
+export const TYPE_COLORS = {
+  Food: "#F59E0B",
+  Tour: "#88C58F",
+  Stay: "#60A5FA",
+  Move: "#A78BFA",
+  Etc: "#94A3B8",
 };
 
 export function WeeklyScheduleView({
@@ -164,7 +164,7 @@ export function WeeklyScheduleView({
               <div
                 key={`time-${hour}-${minute}`}
                 className={cn(
-                  "text-xs text-right pr-2 h-12 flex items-center justify-end border-r",
+                  "text-xs text-right pr-2 h-6 flex items-center justify-end border-r",
                   minute === 0
                     ? "font-medium"
                     : "text-muted-foreground text-[10px]"
@@ -184,7 +184,7 @@ export function WeeklyScheduleView({
                   <div
                     key={`slot-${day.toISOString()}-${hour}-${minute}`}
                     className={cn(
-                      "h-12 border border-dashed border-border/40 rounded-sm p-0.5",
+                      "h-6 border border-dashed border-border/40 rounded-sm p-0.5",
                       events.length > 0 && "bg-muted/30"
                     )}
                   >
@@ -216,8 +216,8 @@ export function WeeklyScheduleView({
                           style={{
                             backgroundColor: `${TYPE_COLORS[event.type]}20`,
                             borderLeft: `3px solid ${TYPE_COLORS[event.type]}`,
-                            top: `${index * 3}rem`,
-                            height: `${heightInSlots * 3}rem`,
+                            top: `${index * 1.5}rem`,
+                            height: `${heightInSlots * 1.5}rem`,
                             left: "0.125rem",
                             right: "0.125rem",
                             zIndex: 5,
@@ -248,14 +248,14 @@ export function WeeklyScheduleView({
           onClick={() => setShowAddEventDialog(true)}
           className="gap-1"
         >
-          <Plus className="h-4 w-4" /> 일정 추가
+          <Plus className="h-4 w-4" /> Add Schedule
         </Button>
       </div>
 
       {/* 일정 추가 다이얼로그 */}
       <Dialog open={showAddEventDialog} onOpenChange={setShowAddEventDialog}>
         <DialogContent className="sm:max-w-[500px]">
-          <DialogTitle>새 일정 추가</DialogTitle>
+          <DialogTitle>Add New Schedule</DialogTitle>
           <AddEventForm
             selectedDate={selectedDate}
             onAddEvent={handleAddEvent}

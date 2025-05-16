@@ -26,20 +26,40 @@ import { ConfirmFormSchema } from "../../lib/confirm-form-schema";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { LikedPlace } from "@/app/modules/map/store/liked-place-store";
+import type { ScheduleItem } from "@/components/weekly-schedule-view";
 
 interface ConfirmFormProps {
   place: LikedPlace;
   onToggleConfirmed: (place: LikedPlace) => void;
+  onAddEvent?: (event: Omit<ScheduleItem, "id" | "color">) => void;
 }
 
-export function ConfirmForm({ place, onToggleConfirmed }: ConfirmFormProps) {
+export function ConfirmForm({ place, onToggleConfirmed, onAddEvent }: ConfirmFormProps) {
   const form = useForm<z.infer<typeof ConfirmFormSchema>>({
     resolver: zodResolver(ConfirmFormSchema),
   });
 
   function onSubmit(data: z.infer<typeof ConfirmFormSchema>) {
+    // 확인(confirm) 처리
     toast.success("Confirmed!");
     onToggleConfirmed(place);
+
+    // 이벤트(스케줄) 추가
+    if (onAddEvent && data.startDate && data.endDate) {
+      const event: Omit<ScheduleItem, "id" | "color"> = {
+        title: place.name,
+        date: new Date(data.startDate),
+        startTime: new Date(data.startDate),
+        endTime: new Date(data.endDate),
+        type: place.type as "Food" | "Tour" | "Stay" | "Move" | "Etc",
+        description: place.address,
+        // placeId: place.id
+      };
+
+      onAddEvent(event);
+      toast.success("Added to schedule!");
+    }
+
     console.log(data);
   }
 
@@ -86,14 +106,14 @@ export function ConfirmForm({ place, onToggleConfirmed }: ConfirmFormProps) {
       >
         <DateTimePickerField
           name="startDate"
-          label="Enter Start Date & Time (12h)"
+          label="Start Date & Time (AM / PM)"
           onDateSelect={handleDateSelect}
           onTimeChange={handleTimeChange}
           form={form}
         />
         <DateTimePickerField
           name="endDate"
-          label="Enter End Date & Time (12h)"
+          label="End Date & Time (AM / PM)"
           onDateSelect={handleDateSelect}
           onTimeChange={handleTimeChange}
           form={form}
@@ -144,9 +164,9 @@ function DateTimePickerField({
                   )}
                 >
                   {field.value ? (
-                    format(field.value, "MM/dd/yyyy hh:mm aa")
+                    format(field.value, "yyyy.MM.dd hh:mm aa")
                   ) : (
-                    <span>MM/DD/YYYY hh:mm aa</span>
+                    <span>YYYY.MM.DD  hh:mm  AM/PM</span>
                   )}
                   <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                 </Button>
@@ -164,14 +184,14 @@ function DateTimePickerField({
                   <ScrollArea className="w-64 sm:w-auto">
                     <div className="flex sm:flex-col p-2">
                       {Array.from({ length: 12 }, (_, i) => i + 1)
-                        .reverse()
+                        // .reverse()
                         .map((hour) => (
                           <Button
                             key={hour}
                             size="icon"
                             variant={
                               field.value &&
-                              field.value.getHours() % 12 === hour % 12
+                                field.value.getHours() % 12 === hour % 12
                                 ? "default"
                                 : "ghost"
                             }
@@ -218,8 +238,8 @@ function DateTimePickerField({
                           size="icon"
                           variant={
                             field.value &&
-                            ((ampm === "AM" && field.value.getHours() < 12) ||
-                              (ampm === "PM" && field.value.getHours() >= 12))
+                              ((ampm === "AM" && field.value.getHours() < 12) ||
+                                (ampm === "PM" && field.value.getHours() >= 12))
                               ? "default"
                               : "ghost"
                           }

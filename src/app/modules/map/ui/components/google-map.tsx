@@ -44,9 +44,11 @@ export function GoogleMap() {
   const googleMaps = useMapStore((state) => state.googleMaps);
   const setGoogleMaps = useMapStore((state) => state.setGoogleMaps);
   const searchParams = useSearchParams();
+
   const chatRoomId = searchParams.get("id");
   const addPlace = useLikedPlaces((state) => state.addPlace);
   const setMarker = useLikedPlaces((state) => state.setMarker);
+
   const accessToken = useAuthStore((s) => s.accessToken);
   if (!accessToken) return null;
   const currentUserName = parseJwt(accessToken!).name;
@@ -161,7 +163,7 @@ export function GoogleMap() {
     };
 
     initMap();
-  }, []);
+  }, [searchParams]);
 
   return (
     <div className="relative w-full h-full">

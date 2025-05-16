@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { ResizableLayout } from "@/components/resizable-layout";
 import { useLikedPlaces } from "@/app/modules/map/store/liked-place-store";
@@ -14,6 +14,7 @@ import { useAuthStore } from "@/store/auth-store";
 import { parseJwt } from "@/lib/parseJwt";
 import { WebSocketInitializer } from "../initializer/websocket-initializer";
 import { useWebSocketStore } from "../store/websocket-store";
+import { usePanelVisibilityStore } from "../store/panel-visibility-store";
 
 export default function Chat() {
   const searchParams = useSearchParams();
@@ -23,10 +24,43 @@ export default function Chat() {
 
   const [inputValue, setInputValue] = useState("");
 
-  // 패널 가시성 상태
-  const [leftPanelVisible, setLeftPanelVisible] = useState(true);
-  const [middlePanelVisible, setMiddlePanelVisible] = useState(true);
-  const [rightPanelVisible, setRightPanelVisible] = useState(true);
+  // 패널 가시성 상태를 zustand 스토어에서 가져옴
+  const {
+    leftPanelVisible,
+    middlePanelVisible,
+    rightPanelVisible,
+    setPanelVisibility,
+    togglePanel
+  } = usePanelVisibilityStore();
+
+  // 패널 가시성에 따라 동적으로 defaultWidth 값 계산
+  const { defaultLeftWidth, defaultMiddleWidth, defaultRightWidth } = useMemo(() => {
+    // 활성화된 패널 수 계산
+    const visibleCount = [leftPanelVisible, middlePanelVisible, rightPanelVisible].filter(Boolean).length;
+
+    if (visibleCount === 1) {
+      // 하나의 패널만 보이는 경우, 해당 패널의 너비를 100%로 설정
+      return {
+        defaultLeftWidth: leftPanelVisible ? 100 : 0,
+        defaultMiddleWidth: middlePanelVisible ? 100 : 0,
+        defaultRightWidth: rightPanelVisible ? 100 : 0
+      };
+    } else if (visibleCount === 2) {
+      // 두 개의 패널이 보이는 경우, 각각 50%씩 할당
+      return {
+        defaultLeftWidth: leftPanelVisible ? 50 : 0,
+        defaultMiddleWidth: middlePanelVisible ? 50 : 0,
+        defaultRightWidth: rightPanelVisible ? 50 : 0
+      };
+    } else {
+      // 세 개의 패널이 모두 보이는 경우 또는 모두 숨겨진 경우(예외 처리)
+      return {
+        defaultLeftWidth: 56,
+        defaultMiddleWidth: 24,
+        defaultRightWidth: 20
+      };
+    }
+  }, [leftPanelVisible, middlePanelVisible, rightPanelVisible]);
 
   const [activeLeftTab, setActiveLeftTab] = useState("map");
   const [activePlacesTab, setActivePlacesTab] =
@@ -40,61 +74,18 @@ export default function Chat() {
   const addMessage = useWebSocketStore((state) => state.addMessage);
   const [isComposing, setIsComposing] = useState(false);
 
-  // 패널 가시성 변경 핸들러 - 이 함수는 ResizableLayout에서만 호출되도록 수정
+  // 패널 가시성 변경 핸들러 - 스토어의 함수 사용
   const handlePanelVisibilityChange = (
     panel: "left" | "middle" | "right",
     visible: boolean
   ) => {
-    // 최소 1개의 패널은 항상 표시되어야 함
-    const currentVisibleCount = [
-      panel === "left" ? visible : leftPanelVisible,
-      panel === "middle" ? visible : middlePanelVisible,
-      panel === "right" ? visible : rightPanelVisible,
-    ].filter(Boolean).length;
-
-    if (currentVisibleCount === 0) return;
-
-    if (panel === "left") setLeftPanelVisible(visible);
-    else if (panel === "middle") setMiddlePanelVisible(visible);
-    else if (panel === "right") setRightPanelVisible(visible);
+    setPanelVisibility(panel, visible);
   };
 
-  // 패널 토글 핸들러 - 버튼 클릭 시 호출되는 함수
-  const toggleLeftPanel = () => {
-    // 이미 하나만 켜져 있고 왼쪽 패널이 켜져 있는 경우 토글 불가
-    const visibleCount = [
-      leftPanelVisible,
-      middlePanelVisible,
-      rightPanelVisible,
-    ].filter(Boolean).length;
-    if (visibleCount === 1 && leftPanelVisible) return;
-
-    setLeftPanelVisible(!leftPanelVisible);
-  };
-
-  const toggleMiddlePanel = () => {
-    // 이미 하나만 켜져 있고 중앙 패널이 켜져 있는 경우 토글 불가
-    const visibleCount = [
-      leftPanelVisible,
-      middlePanelVisible,
-      rightPanelVisible,
-    ].filter(Boolean).length;
-    if (visibleCount === 1 && middlePanelVisible) return;
-
-    setMiddlePanelVisible(!middlePanelVisible);
-  };
-
-  const toggleRightPanel = () => {
-    // 이미 하나만 켜져 있고 오른쪽 패널이 켜져 있는 경우 토글 불가
-    const visibleCount = [
-      leftPanelVisible,
-      middlePanelVisible,
-      rightPanelVisible,
-    ].filter(Boolean).length;
-    if (visibleCount === 1 && rightPanelVisible) return;
-
-    setRightPanelVisible(!rightPanelVisible);
-  };
+  // 패널 토글 핸들러 - 스토어의 함수 사용
+  const toggleLeftPanel = () => togglePanel('left');
+  const toggleMiddlePanel = () => togglePanel('middle');
+  const toggleRightPanel = () => togglePanel('right');
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
@@ -125,15 +116,15 @@ export default function Chat() {
       ...eventData,
       placeId: eventData.placeId || `temp-${Date.now()}`, // Provide a fallback for placeId
       color:
-        eventData.type === "식사"
+        eventData.type === "Food"
           ? "#F59E0B"
-          : eventData.type === "관광"
-          ? "#88C58F"
-          : eventData.type === "숙박"
-          ? "#60A5FA"
-          : eventData.type === "이동"
-          ? "#A78BFA"
-          : "#94A3B8",
+          : eventData.type === "Tour"
+            ? "#88C58F"
+            : eventData.type === "Stay"
+              ? "#60A5FA"
+              : eventData.type === "Move"
+                ? "#A78BFA"
+                : "#94A3B8",
     };
 
     setScheduleItems((prev) => [...prev, newEvent]);
@@ -156,6 +147,7 @@ export default function Chat() {
       {/* Main Content with Resizable Layout */}
       <div className="w-full mt-14">
         <ResizableLayout
+          key={`panels-${leftPanelVisible ? 1 : 0}-${middlePanelVisible ? 1 : 0}-${rightPanelVisible ? 1 : 0}`}
           leftContent={
             <LeftPanel
               activeTab={activeLeftTab}
@@ -170,6 +162,7 @@ export default function Chat() {
               likedPlaces={likedPlaces}
               activePlacesTab={activePlacesTab}
               onActivePlacesTabChange={setActivePlacesTab}
+              onAddEvent={handleAddEvent}
             />
           }
           rightContent={
@@ -182,6 +175,9 @@ export default function Chat() {
               onSetIsComposing={(value) => setIsComposing(value)}
             />
           }
+          defaultLeftWidth={defaultLeftWidth}
+          defaultMiddleWidth={defaultMiddleWidth}
+          defaultRightWidth={defaultRightWidth}
           leftVisible={leftPanelVisible}
           middleVisible={middlePanelVisible}
           rightVisible={rightPanelVisible}

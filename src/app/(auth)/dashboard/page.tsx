@@ -310,13 +310,10 @@ export default function DashboardPage() {
                       <>
                         <div className="flex items-center mb-3">
                           <Link className="h-4 w-4 text-foreground/70 mr-2 shrink-0" />
-                          <span className="text-sm font-medium">
-                            Invite Code:
-                          </span>
                           <Button
                             variant="outline"
                             size="sm"
-                            className="ml-2 flex items-center gap-1"
+                            className="flex items-center gap-1"
                             onClick={() => {
                               // Generate the invite link
                               const inviteLink = `${window.location.origin}/dashboard/invite?code=${details.inviteCode}`;
@@ -335,10 +332,9 @@ export default function DashboardPage() {
                                 });
                             }}
                           >
-                            <span className="truncate max-w-[100px]">
-                              {details.inviteCode}
+                            <span className="truncate">
+                              Click to copy invite link
                             </span>
-                            <Clipboard className="h-4 w-4" />
                           </Button>
                         </div>
 

@@ -32,17 +32,20 @@ import {
 } from "@/app/modules/map/store/liked-place-store";
 import { PlaceDialog } from "./components/place-dialog";
 import { PlacesTabType } from "../types";
+import type { ScheduleItem } from "@/components/weekly-schedule-view";
 
 interface MiddlePanelProps {
   likedPlaces: LikedPlace[];
   activePlacesTab: PlacesTabType;
-  onActivePlacesTabChange: (value: PlacesTabType) => void;
+  onActivePlacesTabChange: (tab: PlacesTabType) => void;
+  onAddEvent?: (event: Omit<ScheduleItem, "id" | "color">) => void;
 }
 
 export const MiddlePanel = ({
   likedPlaces,
   activePlacesTab,
   onActivePlacesTabChange,
+  onAddEvent,
 }: MiddlePanelProps) => {
   const [placeFilter, setPlaceFilter] = useState<string>("all");
   const [timeFilter, setTimeFilter] = useState<string>("all");
@@ -55,36 +58,6 @@ export const MiddlePanel = ({
       activePlacesTab === "confirmed"
         ? place.iconType === IconType.STAR
         : place.iconType === IconType.HEART;
-
-    // // Then apply additional filters
-    // const matchesType = placeFilter === "all" || place.type === placeFilter;
-
-    // // Time filter
-    // let matchesTime = true;
-    // if (timeFilter !== "all" && place.visitTime) {
-    //   const hour = place.visitTime.getHours();
-    //   if (timeFilter === "morning" && (hour < 5 || hour >= 12))
-    //     matchesTime = false;
-    //   if (timeFilter === "afternoon" && (hour < 12 || hour >= 17))
-    //     matchesTime = false;
-    //   if (timeFilter === "evening" && (hour < 17 || hour >= 21))
-    //     matchesTime = false;
-    //   if (timeFilter === "night" && (hour < 21 || hour >= 5))
-    //     matchesTime = false;
-    // }
-
-    // // Date filter
-    // let matchesDate = true;
-    // if (dateFilter && place.visitTime) {
-    //   const visitDate = new Date(place.visitTime);
-    //   const filterDate = new Date(dateFilter);
-    //   matchesDate =
-    //     visitDate.getFullYear() === filterDate.getFullYear() &&
-    //     visitDate.getMonth() === filterDate.getMonth() &&
-    //     visitDate.getDate() === filterDate.getDate();
-    // }
-
-    // return matchesTab && matchesType && matchesTime && matchesDate;
 
     return matchesTab;
   });
@@ -135,11 +108,11 @@ export const MiddlePanel = ({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="식사">식사</SelectItem>
-                  <SelectItem value="관광">관광</SelectItem>
-                  <SelectItem value="숙박">숙박</SelectItem>
-                  <SelectItem value="이동">이동</SelectItem>
-                  <SelectItem value="기타">기타</SelectItem>
+                  <SelectItem value="Food">Food</SelectItem>
+                  <SelectItem value="Tour">Tour</SelectItem>
+                  <SelectItem value="Stay">Stay</SelectItem>
+                  <SelectItem value="Move">Move</SelectItem>
+                  <SelectItem value="Etc">Etc</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -189,6 +162,7 @@ export const MiddlePanel = ({
                   key={place.placeId}
                   place={place}
                   activePlacesTab={activePlacesTab}
+                // onAddEvent={onAddEvent}
                 />
               ))}
             </div>

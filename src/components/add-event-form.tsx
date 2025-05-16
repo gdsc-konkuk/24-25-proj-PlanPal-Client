@@ -10,7 +10,7 @@ import { Calendar } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 
-type EventType = "식사" | "관광" | "숙박" | "이동" | "기타"
+type EventType = "Food" | "Tour" | "Stay" | "Move" | "Etc"
 
 interface AddEventFormProps {
   selectedDate: Date
@@ -30,7 +30,7 @@ export function AddEventForm({ selectedDate, onAddEvent, onCancel }: AddEventFor
   const [date, setDate] = useState<Date | undefined>(selectedDate)
   const [startTime, setStartTime] = useState("09:00")
   const [duration, setDuration] = useState("60")
-  const [eventType, setEventType] = useState<EventType>("관광")
+  const [eventType, setEventType] = useState<EventType>("Tour")
   const [description, setDescription] = useState("")
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -59,24 +59,24 @@ export function AddEventForm({ selectedDate, onAddEvent, onCancel }: AddEventFor
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="event-title">일정 제목</Label>
+        <Label htmlFor="event-title">Title</Label>
         <Input
           id="event-title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="예: 도쿄 스카이트리 방문"
+          placeholder="ex) Tour into the Konkuk University"
           required
         />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>날짜</Label>
+          <Label>Date</Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="w-full justify-start text-left font-normal">
                 <Calendar className="mr-2 h-4 w-4" />
-                {date ? format(date, "yyyy년 MM월 dd일") : "날짜 선택"}
+                {date ? format(date, "yyyy.MM.dd") : "select date"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
@@ -86,17 +86,17 @@ export function AddEventForm({ selectedDate, onAddEvent, onCancel }: AddEventFor
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="event-type">일정 유형</Label>
+          <Label htmlFor="event-type">Type</Label>
           <Select value={eventType} onValueChange={(value) => setEventType(value as EventType)}>
             <SelectTrigger id="event-type">
-              <SelectValue placeholder="유형 선택" />
+              <SelectValue placeholder="select type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="식사">식사</SelectItem>
-              <SelectItem value="관광">관광</SelectItem>
-              <SelectItem value="숙박">숙박</SelectItem>
-              <SelectItem value="이동">이동</SelectItem>
-              <SelectItem value="기타">기타</SelectItem>
+              <SelectItem value="Food">Food</SelectItem>
+              <SelectItem value="Tour">Tour</SelectItem>
+              <SelectItem value="Stay">Stay</SelectItem>
+              <SelectItem value="Move">Move</SelectItem>
+              <SelectItem value="Etc">Etc</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -104,7 +104,7 @@ export function AddEventForm({ selectedDate, onAddEvent, onCancel }: AddEventFor
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="start-time">시작 시간</Label>
+          <Label htmlFor="start-time">Start Time</Label>
           <Input
             id="start-time"
             type="time"
@@ -115,42 +115,41 @@ export function AddEventForm({ selectedDate, onAddEvent, onCancel }: AddEventFor
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="duration">소요 시간 (분)</Label>
+          <Label htmlFor="duration">Duration (min)</Label>
           <Select value={duration} onValueChange={setDuration}>
             <SelectTrigger id="duration">
-              <SelectValue placeholder="소요 시간" />
+              <SelectValue placeholder="Duration" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="30">30분</SelectItem>
-              <SelectItem value="60">1시간</SelectItem>
-              <SelectItem value="90">1시간 30분</SelectItem>
-              <SelectItem value="120">2시간</SelectItem>
-              <SelectItem value="180">3시간</SelectItem>
-              <SelectItem value="240">4시간</SelectItem>
-              <SelectItem value="360">6시간</SelectItem>
-              <SelectItem value="480">8시간</SelectItem>
-              <SelectItem value="720">12시간</SelectItem>
-              <SelectItem value="1440">24시간</SelectItem>
+              <SelectItem value="30">30 min</SelectItem>
+              <SelectItem value="60">1 hour</SelectItem>
+              <SelectItem value="90">1 hour 30 min</SelectItem>
+              <SelectItem value="120">2 hours</SelectItem>
+              <SelectItem value="180">3 hours</SelectItem>
+              <SelectItem value="240">4 hours</SelectItem>
+              <SelectItem value="360">6 hours</SelectItem>
+              <SelectItem value="480">8 hours</SelectItem>
+              <SelectItem value="720">12 hours</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="event-description">설명 (선택사항)</Label>
+        <Label htmlFor="event-description">Description (Optional)</Label>
         <Input
           id="event-description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="일정에 대한 추가 정보"
+          placeholder="Additional information about the event"
         />
       </div>
 
       <div className="flex justify-end space-x-2 pt-2">
         <Button type="button" variant="outline" onClick={onCancel}>
-          취소
+          Cancel
         </Button>
-        <Button type="submit">일정 추가</Button>
+        <Button type="submit">Add Event</Button>
       </div>
     </form>
   )
